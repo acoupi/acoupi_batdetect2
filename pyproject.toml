@@ -7,8 +7,11 @@ authors = [
     {name = "Santiago Martinez Balvanera", email="santiago.balvanera.20@ucl.uk.ac"},
 ]
 
-dependencies = []
-requires-python = ">=3.9,<3.12"
+dependencies = [
+    "batdetect2>=1.0.7",
+    "pyproject-toml>=0.0.10",
+]
+requires-python = ">=3.9,<3.11"
 readme = "README.md"
 license = {text = "Creative Commons Attribution-NonCommercial 4.0 International"}
 
