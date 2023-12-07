@@ -1,0 +1,28 @@
+[project]
+name = "acoupi-batdetect2"
+version = "0.1.0"
+description = "An acoupi-compatible BatDetect2 model and program."
+authors = [
+    {name = "Aude Vuilliomenet", email = "aude.vuilliomenet.18@ucl.ac.uk"}, 
+    {name = "Santiago Martinez Balvanera", email="santiago.balvanera.20@ucl.uk.ac"},
+]
+
+dependencies = []
+requires-python = ">=3.9,<3.12"
+readme = "README.md"
+license = {text = "Creative Commons Attribution-NonCommercial 4.0 International"}
+
+[build-system]
+requires = ["pdm-backend"]
+build-backend = "pdm.backend"
+
+[tool.pdm.dev-dependencies]
+dev = [
+    "acoupi @ file:///Users/audevuilliomenet/Documents/venv_acoupi/acoupi",
+    "pytest>=7.4.3",
+]
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.9"
