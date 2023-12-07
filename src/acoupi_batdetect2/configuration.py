@@ -1,8 +1,9 @@
 """Batdetect2 Program Configuration Options."""
 import datetime
 from pathlib import Path
+from typing import Optional
 
-from pydantic import BaseModel, Field, Optional
+from pydantic import BaseModel, Field
 from acoupi.system.constants import ACOUPI_HOME
 
 """Default paramaters for Batdetect2 Program"""
