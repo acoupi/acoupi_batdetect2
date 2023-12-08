@@ -28,9 +28,9 @@ class AudioConfig(BaseModel):
 class RecordingSchedule(BaseModel):
     """Recording schedule config."""
 
-    start_recording: datetime.time = datetime.time(hour=12, minute=0, second=0)
+    start_recording: datetime.time = datetime.time(hour=10, minute=0, second=0)
 
-    end_recording: datetime.time = datetime.time(hour=21, minute=0, second=0)
+    end_recording: datetime.time = datetime.time(hour=20, minute=0, second=0)
 
 
 # class RecordingSaving(BaseModel):
@@ -45,19 +45,19 @@ class SaveRecordingFilter(BaseModel):
 
     after_dawndusk_duration: int = 10
 
-    frequency_duration: int = 5
+    frequency_duration: int = None
 
-    frequency_interval: int = 30
+    frequency_interval: int = None
 
-    threshold: float = 0.8
+    saving_threshold: float = 0.8
 
 
 class AudioDirectories(BaseModel):
     """Audio Recording Directories configuration."""
 
-    audio_dir_true: Path = Path.home() / "storages" / "bats" / "recordings"
+    audio_dir_true: Path = ACOUPI_HOME / "storages" / "recordings" / "bats"
 
-    audio_dir_false: Path = Path.home() / "storages" / "no_bats" / "recordings"
+    audio_dir_false: Path = ACOUPI_HOME / "storages" / "recordings" / "no_bats"
 
 
 class MQTT_MessageConfig(BaseModel):
@@ -97,9 +97,11 @@ class BatDetect2_ConfigSchema(BaseModel):
 
     name: str = "batdetect2"
 
-    threshold: float = 0.2
+    detection_threshold: float = 0.2
 
     dbpath: Path = ACOUPI_HOME / "storages" / "acoupi.db"
+
+    dbpath_messages: Path = ACOUPI_HOME / "storages" / "acoupi_messages.db"
 
     timeformat: str = "%Y%m%d_%H%M%S"
 
@@ -117,7 +119,7 @@ class BatDetect2_ConfigSchema(BaseModel):
         default_factory=SaveRecordingFilter,
     )
 
-    audio_directories: AudioDirectories = Field(
+    audio_directories: Optional[AudioDirectories] = Field(
         default_factory=AudioDirectories,
     )
 

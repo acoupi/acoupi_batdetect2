@@ -21,8 +21,6 @@ class BatDetect2_Program(AcoupiProgram):
         4. Create Message Task
 
         """
-        dbpath = components.SqliteStore(config.dbpath)
-        dbpath_message = components.SqliteMessageStore(db_path=config.dbpath)
 
         # Step 1 - Audio Recordings Task
         recording_task = tasks.generate_recording_task(
@@ -33,7 +31,7 @@ class BatDetect2_Program(AcoupiProgram):
                 chunksize=config.audio_config.chunksize,
                 device_index=config.audio_config.device_index,
             ),
-            store=dbpath,
+            store=components.SqliteStore(config.dbpath),
             # logger
             recording_conditions=[
                 components.IsInIntervals(
@@ -58,12 +56,14 @@ class BatDetect2_Program(AcoupiProgram):
 
         # Step 2 - Model Detections Task
         detection_task = tasks.generate_detection_task(
-            store=dbpath,
+            store=components.SqliteStore(config.dbpath),
             model=BatDetect2(),
-            message_store=dbpath_message,
+            message_store=components.SqliteMessageStore(db_path=config.dbpath_messages),
             # logger
             output_cleaners=[
-                components.ThresholdDetectionFilter(threshold=config.threshold)
+                components.ThresholdDetectionFilter(
+                    threshold=config.detection_threshold
+                )
             ],
             message_factories=[components.FullModelOutputMessageBuilder()],
         )
@@ -106,7 +106,7 @@ class BatDetect2_Program(AcoupiProgram):
             elif components.ThresholdRecordingFilter is not None:
                 saving_filters.add(
                     components.ThresholdRecordingFilter(
-                        threshold=config.recording_saving.threshold,
+                        threshold=config.recording_saving.saving_threshold,
                     )
                 )
             else:
@@ -116,7 +116,7 @@ class BatDetect2_Program(AcoupiProgram):
 
         file_management_task = (
             tasks.generate_file_management_task(
-                store=dbpath,
+                store=components.SqliteStore(config.dbpath),
                 file_manager=components.SaveRecordingManager(
                     dirpath_true=config.audio_directories.audio_dir_true,
                     dirpath_false=config.audio_directories.audio_dir_false,
@@ -164,10 +164,11 @@ class BatDetect2_Program(AcoupiProgram):
             return data_messengers
 
         send_data_task = tasks.generate_send_data_task(
-            message_store=dbpath_message,
+            message_store=components.SqliteMessageStore(db_path=config.dbpath_messages),
             messenger=create_messenger(),
         )
 
+        # Final Step - Add Tasks to Program
         self.add_task(
             function=recording_task,
             callbacks=[detection_task],
