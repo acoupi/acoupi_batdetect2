@@ -25,4 +25,4 @@ def test_batdetect2():
 
     assert isinstance(detections, data.ModelOutput)
     assert detections.name_model == "BatDetect2"
-    assert len(detections.detections) == 25
+    assert len(detections.detections) == 51
