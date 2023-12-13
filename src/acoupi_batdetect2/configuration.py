@@ -3,8 +3,8 @@ import datetime
 from pathlib import Path
 from typing import Optional
 
-from pydantic import BaseModel, Field
 from acoupi.system.constants import ACOUPI_HOME
+from pydantic import BaseModel, Field
 
 """Default paramaters for Batdetect2 Program"""
 
@@ -45,9 +45,9 @@ class SaveRecordingFilter(BaseModel):
 
     after_dawndusk_duration: int = 10
 
-    frequency_duration: int = None
+    frequency_duration: Optional[int] = None
 
-    frequency_interval: int = None
+    frequency_interval: Optional[int] = None
 
     saving_threshold: float = 0.8
 
@@ -119,7 +119,7 @@ class BatDetect2_ConfigSchema(BaseModel):
         default_factory=SaveRecordingFilter,
     )
 
-    audio_directories: Optional[AudioDirectories] = Field(
+    audio_directories: AudioDirectories = Field(
         default_factory=AudioDirectories,
     )
 

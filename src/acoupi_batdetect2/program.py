@@ -1,8 +1,11 @@
 """Batdetect2 Program."""
 import datetime
-from celery.schedules import crontab
+
+import pytz
 from acoupi import components, data, tasks
 from acoupi.programs.base import AcoupiProgram
+from celery.schedules import crontab
+
 from acoupi_batdetect2.configuration import BatDetect2_ConfigSchema
 from acoupi_batdetect2.model import BatDetect2
 
@@ -19,8 +22,8 @@ class BatDetect2_Program(AcoupiProgram):
         2. Create Detection Task
         3. Create Saving Recording Filter and Management Task
         4. Create Message Task
-
         """
+        timezone = pytz.timezone(config.timezone)
 
         # Step 1 - Audio Recordings Task
         recording_task = tasks.generate_recording_task(
@@ -49,7 +52,7 @@ class BatDetect2_Program(AcoupiProgram):
                             end=config.recording_schedule.end_recording,
                         ),
                     ],
-                    timezone=config.timezone,
+                    timezone=timezone,
                 )
             ],
         )
@@ -70,43 +73,56 @@ class BatDetect2_Program(AcoupiProgram):
 
         # Step 3 - Files Management Task
         def create_file_filters():
-            saving_filters = []
+            recording_saving = config.recording_saving
 
-            if components.SaveIfInInterval is not None:
-                saving_filters.add(
+            if recording_saving is None:
+                return []
+
+            saving_filters = []
+            if (
+                recording_saving.starttime is not None
+                and recording_saving.endtime is not None
+            ):
+                saving_filters.append(
                     components.SaveIfInInterval(
                         interval=data.TimeInterval(
-                            start=config.recording_saving.starttime,
-                            end=config.recording_saving.endtime,
+                            start=recording_saving.starttime,
+                            end=recording_saving.endtime,
                         ),
-                        timezone=config.timezone,
+                        timezone=timezone,
                     )
                 )
-            elif components.FrequencySchedule is not None:
-                saving_filters.add(
+
+            elif (
+                recording_saving.frequency_duration is not None
+                and recording_saving.frequency_interval is not None
+            ):
+                saving_filters.append(
                     components.FrequencySchedule(
-                        duration=config.recording_saving.frequency_duration,
-                        frequency=config.recording_saving.frequency_interval,
+                        duration=recording_saving.frequency_duration,
+                        frequency=recording_saving.frequency_interval,
                     )
                 )
-            elif components.Before_DawnDuskTimeInterval is not None:
-                saving_filters.add(
+
+            elif recording_saving.before_dawndusk_duration is not None:
+                saving_filters.append(
                     components.Before_DawnDuskTimeInterval(
-                        duration=config.recording_saving.before_dawndusk_duration,
-                        timezone=config.timezone,
+                        duration=recording_saving.before_dawndusk_duration,
+                        timezone=timezone,
                     )
                 )
-            elif components.After_DawnDuskTimeInterval is not None:
-                saving_filters.add(
+
+            elif recording_saving.after_dawndusk_duration is not None:
+                saving_filters.append(
                     components.After_DawnDuskTimeInterval(
-                        duration=config.recording_saving.after_dawndusk_duration,
-                        timezone=config.timezone,
+                        duration=recording_saving.after_dawndusk_duration,
+                        timezone=timezone,
                     )
                 )
-            elif components.ThresholdRecordingFilter is not None:
-                saving_filters.add(
+            elif recording_saving.saving_threshold is not None:
+                saving_filters.append(
                     components.ThresholdRecordingFilter(
-                        threshold=config.recording_saving.saving_threshold,
+                        threshold=recording_saving.saving_threshold,
                     )
                 )
             else:
@@ -114,54 +130,44 @@ class BatDetect2_Program(AcoupiProgram):
 
             return saving_filters
 
-        file_management_task = (
-            tasks.generate_file_management_task(
-                store=components.SqliteStore(config.dbpath),
-                file_manager=components.SaveRecordingManager(
-                    dirpath_true=config.audio_directories.audio_dir_true,
-                    dirpath_false=config.audio_directories.audio_dir_false,
-                    timeformat=config.timeformat,
-                    threshold=config.threshold,
-                ),
-                file_filters=create_file_filters(),
+        file_management_task = tasks.generate_file_management_task(
+            store=components.SqliteStore(config.dbpath),
+            file_manager=components.SaveRecordingManager(
+                dirpath=config.audio_directories.audio_dir_true,
+                dirpath_true=config.audio_directories.audio_dir_true,
+                dirpath_false=config.audio_directories.audio_dir_false,
+                timeformat=config.timeformat,
+                threshold=config.detection_threshold,
             ),
+            file_filters=create_file_filters(),
         )
 
         # Step 4 - Send Data Task
         def create_messenger():
-            data_messengers = []
-
-            if components.HTTPMessenger is not None:
-                data_messengers.add(
-                    components.HTTPMessenger(
-                        base_url=config.http_message_config.baseurl,
-                        base_params={
-                            "client-id": config.http_message_config.client_id,
-                            "password": config.http_message_config.client_password,
-                        },
-                        headers={
-                            "Accept": config.http_message_config.content_type,
-                            "Authorization": config.http_message_config.api_key,
-                        },
-                    )
-                )
-            elif components.MQTTMessenger is not None:
-                data_messengers.add(
-                    components.MQTTMessenger(
-                        host=config.mqtt_message_config.host,
-                        port=config.mqtt_message_config.port,
-                        password=config.mqtt_message_config.client_password,
-                        username=config.mqtt_message_config.client_username,
-                        topic=config.mqtt_message_config.topic,
-                        clientid=config.mqtt_message_config.clientid,
-                    )
-                )
-            else:
-                raise UserWarning(
-                    "No Messenger defined - no data will be communicated."
+            if config.http_message_config is not None:
+                return components.HTTPMessenger(
+                    base_url=config.http_message_config.baseurl,
+                    base_params={
+                        "client-id": config.http_message_config.client_id,
+                        "password": config.http_message_config.client_password,
+                    },
+                    headers={
+                        "Accept": config.http_message_config.content_type,
+                        "Authorization": config.http_message_config.api_key,
+                    },
                 )
 
-            return data_messengers
+            if config.mqtt_message_config is not None:
+                return components.MQTTMessenger(
+                    host=config.mqtt_message_config.host,
+                    port=config.mqtt_message_config.port,
+                    password=config.mqtt_message_config.client_password,
+                    username=config.mqtt_message_config.client_username,
+                    topic=config.mqtt_message_config.topic,
+                    clientid=config.mqtt_message_config.clientid,
+                )
+
+            raise UserWarning("No Messenger defined - no data will be communicated.")
 
         send_data_task = tasks.generate_send_data_task(
             message_store=components.SqliteMessageStore(db_path=config.dbpath_messages),
