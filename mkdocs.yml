@@ -1,0 +1,69 @@
+site_name: acoupi-batdetect2
+site_url: https://acoupi.github.io/acoupi-batdetect2/
+nav:
+  - Home: index.md
+  - User Guide:
+      - user_guide/index.md
+      - Installation: user_guide/installation.md
+      - Configuration: user_guide/configuration.md
+      - FAQ: user_guide/faq.md
+  - Reference:
+  - About the Project:
+      - Authors: authors.md
+      - License: license.md
+  - Contributing: contributing.md
+  - Code of Conduct: code_of_conduct.md
+theme:
+  name: material
+  # logo: assets/logo.svg
+  font:
+    text: Mulish
+  favicon: assets/favicon.svg
+  features:
+    - content.code.copy
+    - navigation.tracking
+    - navigation.indexes
+    - navigation.top
+    - toc.follow
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+plugins:
+  - search
+  - mkdocstrings:
+      default_handler: python
+markdown_extensions:
+  - abbr
+  - attr_list
+  - def_list
+  - footnotes
+  - admonition
+  - tables
+  - pymdownx.critic
+  - pymdownx.keys
+  - pymdownx.details
+  - pymdownx.superfences:
+      preserve_tabs: true
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.snippets
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - toc:
+      toc_depth: 4
+      permalink: "#"
+      separator: "_"
+watch:
+  - docs
+  - src
