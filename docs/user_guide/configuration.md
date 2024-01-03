@@ -17,7 +17,7 @@ When running the initial command `acoupi setup --program acoupi_batdetect2.progr
 The configurations can be grouped as follows: 
 
 - [Program Setup](#program-setup-parameters)
-- [Audio and Microphone](#audio-parameters)
+- [Audio and Microphone](#audio-and-microphone-parameters)
 - [Recording Schedule](#recording-schedule-parameters)
 - [Saving Recordings](#saving-recordings-parameters)
 - [Remote Messaging](#remote-messaging)
