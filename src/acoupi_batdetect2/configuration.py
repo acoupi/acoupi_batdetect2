@@ -14,13 +14,13 @@ class AudioConfig(BaseModel):
 
     audio_duration: int = 3
 
-    samplerate: int = 192_000
+    samplerate: int = 250_000
 
     audio_channels: int = 1
 
     chunksize: int = 8192
 
-    device_index: int = 0
+    device_index: int = 1
 
     recording_interval: int = 10
 
@@ -37,13 +37,13 @@ class RecordingSchedule(BaseModel):
 class SaveRecordingFilter(BaseModel):
     """Recording saving options configuration."""
 
-    starttime: datetime.time = datetime.time(hour=21, minute=30, second=0)
+    starttime: datetime.time = datetime.time(hour=9, minute=30, second=0)
 
-    endtime: datetime.time = datetime.time(hour=23, minute=30, second=0)
+    endtime: datetime.time = datetime.time(hour=20, minute=30, second=0)
 
-    before_dawndusk_duration: int = 10
+    before_dawndusk_duration: int = 0
 
-    after_dawndusk_duration: int = 10
+    after_dawndusk_duration: int = 0
 
     frequency_duration: Optional[int] = None
 

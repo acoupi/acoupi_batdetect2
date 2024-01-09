@@ -4,6 +4,7 @@ import datetime
 import pytz
 from acoupi import components, data, tasks
 from acoupi.programs.base import AcoupiProgram
+from acoupi.programs.workers import AcoupiWorker, WorkerConfig
 from celery.schedules import crontab
 
 from acoupi_batdetect2.configuration import BatDetect2_ConfigSchema
@@ -14,6 +15,20 @@ class BatDetect2_Program(AcoupiProgram):
     """BatDetect2 Program."""
 
     config: BatDetect2_ConfigSchema
+
+    worker_config: WorkerConfig = WorkerConfig(
+        workers=[
+            AcoupiWorker(
+                name="recording_worker",
+                queues=["recording"],
+                concurrency=1,
+            ),
+            AcoupiWorker(
+                name="default_worker",
+                queues=["default"],
+            ),
+        ],
+    )
 
     def setup(self, config: BatDetect2_ConfigSchema):
         """Setup.
@@ -179,14 +194,17 @@ class BatDetect2_Program(AcoupiProgram):
             function=recording_task,
             callbacks=[detection_task],
             schedule=datetime.timedelta(seconds=10),
+            queue="recording",
         )
 
         self.add_task(
             function=file_management_task,
             schedule=datetime.timedelta(minutes=10),
+            queue="default",
         )
 
         self.add_task(
             function=send_data_task,
             schedule=crontab(minute="*/1"),
+            queue="default",
         )
