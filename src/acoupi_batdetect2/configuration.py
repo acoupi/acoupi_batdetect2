@@ -3,24 +3,31 @@ import datetime
 from pathlib import Path
 from typing import Optional
 
-from acoupi.system.constants import ACOUPI_HOME
 from pydantic import BaseModel, Field
 
 """Default paramaters for Batdetect2 Program"""
 
 
-class AudioConfig(BaseModel):
-    """Audio and microphone configuration parameters."""
-
-    audio_duration: int = 3
+class MicrophoneConfig(BaseModel):
+    """Microphone configuration parameters."""
 
     samplerate: int = 250_000
 
     audio_channels: int = 1
 
-    chunksize: int = 8192
-
     device_index: int = 1
+
+
+class AudioConfig(BaseModel):
+    """Audio and microphone configuration parameters."""
+
+    microphone_config: MicrophoneConfig = Field(
+        default_factory=MicrophoneConfig,
+    )
+
+    audio_duration: int = 3
+
+    chunksize: int = 8192
 
     recording_interval: int = 10
 
@@ -55,9 +62,11 @@ class SaveRecordingFilter(BaseModel):
 class AudioDirectories(BaseModel):
     """Audio Recording Directories configuration."""
 
-    audio_dir_true: Path = ACOUPI_HOME / "storages" / "recordings" / "bats"
+    audio_dir: Path = Path.home() / "storages" / "recordings"
 
-    audio_dir_false: Path = ACOUPI_HOME / "storages" / "recordings" / "no_bats"
+    audio_dir_true: Path = Path.home() / "storages" / "recordings" / "bats"
+
+    audio_dir_false: Path = Path.home() / "storages" / "recordings" / "no_bats"
 
 
 class MQTT_MessageConfig(BaseModel):
@@ -99,13 +108,17 @@ class BatDetect2_ConfigSchema(BaseModel):
 
     detection_threshold: float = 0.2
 
-    dbpath: Path = ACOUPI_HOME / "storages" / "acoupi.db"
+    dbpath: Path = Path.home() / "storages" / "acoupi.db"
 
-    dbpath_messages: Path = ACOUPI_HOME / "storages" / "acoupi_messages.db"
+    dbpath_messages: Path = Path.home() / "storages" / "acoupi_messages.db"
 
     timeformat: str = "%Y%m%d_%H%M%S"
 
     timezone: str = "Europe/London"
+
+    microphone: MicrophoneConfig = Field(
+        default_factory=MicrophoneConfig,
+    )
 
     audio_config: AudioConfig = Field(
         default_factory=AudioConfig,

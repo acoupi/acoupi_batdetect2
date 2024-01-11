@@ -40,14 +40,35 @@ class BatDetect2_Program(AcoupiProgram):
         """
         timezone = pytz.timezone(config.timezone)
 
+        if not config.dbpath.parent.exists():
+            config.dbpath.parent.touch()
+
+        if not config.dbpath.exists():
+            config.dbpath.touch()
+
+        if not config.dbpath_messages.exists():
+            config.dbpath_messages.touch()
+
+        if not config.audio_directories.audio_dir_true.parent.exists():
+            config.audio_directories.audio_dir_true.parent.mkdir(parents=True)
+
+        if not config.audio_directories.audio_dir_true.exists():
+            config.audio_directories.audio_dir_true.mkdir(parents=True)
+
+        if not config.audio_directories.audio_dir_false.parent.exists():
+            config.audio_directories.audio_dir_false.parent.mkdir(parents=True)
+
+        if not config.audio_directories.audio_dir_false.exists():
+            config.audio_directories.audio_dir_false.mkdir(parents=True)
+
         # Step 1 - Audio Recordings Task
         recording_task = tasks.generate_recording_task(
             recorder=components.PyAudioRecorder(
                 duration=config.audio_config.audio_duration,
-                samplerate=config.audio_config.samplerate,
-                audio_channels=config.audio_config.audio_channels,
+                samplerate=config.microphone.samplerate,
+                audio_channels=config.microphone.audio_channels,
                 chunksize=config.audio_config.chunksize,
-                device_index=config.audio_config.device_index,
+                device_index=config.microphone.device_index,
             ),
             store=components.SqliteStore(config.dbpath),
             # logger
@@ -148,7 +169,7 @@ class BatDetect2_Program(AcoupiProgram):
         file_management_task = tasks.generate_file_management_task(
             store=components.SqliteStore(config.dbpath),
             file_manager=components.SaveRecordingManager(
-                dirpath=config.audio_directories.audio_dir_true,
+                dirpath=config.audio_directories.audio_dir,
                 dirpath_true=config.audio_directories.audio_dir_true,
                 dirpath_false=config.audio_directories.audio_dir_false,
                 timeformat=config.timeformat,
@@ -198,8 +219,14 @@ class BatDetect2_Program(AcoupiProgram):
         )
 
         self.add_task(
+            function=detection_task,
+            schedule=datetime.timedelta(seconds=15),
+            queue="detection",
+        )
+
+        self.add_task(
             function=file_management_task,
-            schedule=datetime.timedelta(minutes=10),
+            schedule=datetime.timedelta(seconds=30),
             queue="default",
         )
 
