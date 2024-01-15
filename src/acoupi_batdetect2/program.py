@@ -1,5 +1,6 @@
 """Batdetect2 Program."""
 import datetime
+from typing import Optional
 
 import pytz
 from acoupi import components, data, tasks
@@ -16,7 +17,7 @@ class BatDetect2_Program(AcoupiProgram):
 
     config: BatDetect2_ConfigSchema
 
-    worker_config: WorkerConfig = WorkerConfig(
+    worker_config: Optional[WorkerConfig] = WorkerConfig(
         workers=[
             AcoupiWorker(
                 name="recording_worker",
