@@ -84,7 +84,7 @@ class BatDetect2_Program(AcoupiProgram):
         recording_task = tasks.generate_recording_task(
             recorder=self.recorder,
             store=self.store,
-            # logger
+            logger=self.logger.getChild("recording"),
             recording_conditions=[
                 components.IsInIntervals(
                     intervals=[
@@ -111,7 +111,7 @@ class BatDetect2_Program(AcoupiProgram):
             store=self.store,
             model=self.model,
             message_store=self.message_store,
-            # logger
+            logger=self.logger.getChild("detection"),
             output_cleaners=[
                 components.ThresholdDetectionFilter(
                     threshold=config.detection_threshold

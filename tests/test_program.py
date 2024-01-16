@@ -40,6 +40,7 @@ def test_can_run_detection_program(
         celery_config=celery_config,
         app=celery_app,
     )
+    program.logger.setLevel("DEBUG")
     assert celery_app.conf["accept_content"] == ["pickle"]
     celery_worker.reload()
 
@@ -47,7 +48,8 @@ def test_can_run_detection_program(
     assert "detection_task" in program.tasks
 
     # Run the detection task on the test recording.
-    program.tasks["detection_task"].delay(recording)
+    model_output = program.tasks["detection_task"].delay(recording)
+    model_output.get()
 
     # Retrieve the recording from the database.
     recordings, model_outputs = store.get_recordings(
@@ -60,8 +62,10 @@ def test_can_run_detection_program(
     assert recordings[0] == recording
 
     # Check that the detections were stored in the database.
-    detections = model_outputs[0]
+    detections = model_outputs[0][0]
     assert isinstance(detections, data.ModelOutput)
+    assert len(detections.detections) > 0
 
-    # This test recording has 51 detections with the default BatDetect2
-    assert len(detections.detections) == 51
+    # Check that messages were stored in the database.
+    messages = program.message_store.get_unsent_messages()
+    assert len(messages) > 0

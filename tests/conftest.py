@@ -26,3 +26,10 @@ def recording() -> data.Recording:
 @pytest.fixture(scope="session")
 def celery_config():
     return CeleryConfig().model_dump()
+
+
+@pytest.fixture(autouse=True)
+def setup_logging(caplog):
+    caplog.set_level("WARNING", logger="numba")
+    caplog.set_level("INFO", logger="celery")
+    caplog.set_level("WARNING", logger="amqp")
