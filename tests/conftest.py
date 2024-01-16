@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 from acoupi import data
+from acoupi.system.configs import CeleryConfig
 
 TEST_RECORDING = Path(__file__).parent / "data" / "audiofile_test1_myomys.wav"
 
@@ -20,3 +21,8 @@ def recording() -> data.Recording:
             name="test",
         ),
     )
+
+
+@pytest.fixture(scope="session")
+def celery_config():
+    return CeleryConfig().model_dump()

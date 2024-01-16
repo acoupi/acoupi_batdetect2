@@ -67,16 +67,23 @@ class BatDetect2_Program(AcoupiProgram):
         if not config.audio_directories.audio_dir_false.exists():
             config.audio_directories.audio_dir_false.mkdir(parents=True)
 
+        self.store = components.SqliteStore(config.dbpath)
+        self.message_store = components.SqliteMessageStore(
+            config.dbpath_messages
+        )
+        self.recorder = components.PyAudioRecorder(
+            duration=config.audio_config.audio_duration,
+            samplerate=config.microphone.samplerate,
+            audio_channels=config.microphone.audio_channels,
+            chunksize=config.audio_config.chunksize,
+            device_index=config.microphone.device_index,
+        )
+        self.model = BatDetect2()
+
         # Step 1 - Audio Recordings Task
         recording_task = tasks.generate_recording_task(
-            recorder=components.PyAudioRecorder(
-                duration=config.audio_config.audio_duration,
-                samplerate=config.microphone.samplerate,
-                audio_channels=config.microphone.audio_channels,
-                chunksize=config.audio_config.chunksize,
-                device_index=config.microphone.device_index,
-            ),
-            store=components.SqliteStore(config.dbpath),
+            recorder=self.recorder,
+            store=self.store,
             # logger
             recording_conditions=[
                 components.IsInIntervals(
@@ -101,9 +108,9 @@ class BatDetect2_Program(AcoupiProgram):
 
         # Step 2 - Model Detections Task
         detection_task = tasks.generate_detection_task(
-            store=components.SqliteStore(config.dbpath),
-            model=BatDetect2(),
-            message_store=components.SqliteMessageStore(db_path=config.dbpath_messages),
+            store=self.store,
+            model=self.model,
+            message_store=self.message_store,
             # logger
             output_cleaners=[
                 components.ThresholdDetectionFilter(
@@ -168,12 +175,14 @@ class BatDetect2_Program(AcoupiProgram):
                     )
                 )
             else:
-                raise UserWarning("No saving filters defined - no files will be saved.")
+                raise UserWarning(
+                    "No saving filters defined - no files will be saved."
+                )
 
             return saving_filters
 
         file_management_task = tasks.generate_file_management_task(
-            store=components.SqliteStore(config.dbpath),
+            store=self.store,
             file_manager=components.SaveRecordingManager(
                 dirpath=config.audio_directories.audio_dir,
                 dirpath_true=config.audio_directories.audio_dir_true,
@@ -209,11 +218,15 @@ class BatDetect2_Program(AcoupiProgram):
                     clientid=config.mqtt_message_config.clientid,
                 )
 
-            raise UserWarning("No Messenger defined - no data will be communicated.")
+            raise UserWarning(
+                "No Messenger defined - no data will be communicated."
+            )
+
+        self.messenger = create_messenger()
 
         send_data_task = tasks.generate_send_data_task(
-            message_store=components.SqliteMessageStore(db_path=config.dbpath_messages),
-            messenger=create_messenger(),
+            message_store=self.message_store,
+            messenger=self.messenger,
         )
 
         # Final Step - Add Tasks to Program

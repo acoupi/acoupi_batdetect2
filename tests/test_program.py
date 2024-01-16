@@ -49,12 +49,9 @@ def test_can_run_detection_program(
     # Run the detection task on the test recording.
     program.tasks["detection_task"].delay(recording)
 
-    path = recording.path
-    assert path is not None
-
     # Retrieve the recording from the database.
     recordings, model_outputs = store.get_recordings(
-        path_ids=[str(path)],
+        ids=[recording.id],
     )
 
     # Check that the recording was stored in the database.
