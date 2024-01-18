@@ -5,13 +5,13 @@
 groups = ["default", "dev"]
 strategy = ["cross_platform"]
 lock_version = "4.4"
-content_hash = "sha256:31f3a082ea87dd6dbea6f884bd4e213a36344e0fd1bc035dcaf888484e607171"
+content_hash = "sha256:2ff31b687e9710b87e702bcb7f1869a05a1ea08dd882d2b74c28eb73115677a4"
 
 [[package]]
 name = "acoupi"
 version = "0.1.0"
 requires_python = ">=3.7,<3.12"
-path = "/home/santiago/Software/iot/acoupi"
+path = "/Users/audevuilliomenet/Documents/venv_acoupi/acoupi"
 summary = "Classifier for bioacoustic devices"
 dependencies = [
     "Jinja2>=3.1.2",

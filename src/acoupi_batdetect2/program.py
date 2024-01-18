@@ -55,14 +55,11 @@ class BatDetect2_Program(AcoupiProgram):
         if not config.dbpath_messages.exists():
             config.dbpath_messages.touch()
 
-        if not config.audio_directories.audio_dir_true.parent.exists():
-            config.audio_directories.audio_dir_true.parent.mkdir(parents=True)
+        if not config.audio_directories.audio_dir.exists():
+            config.audio_directories.audio_dir.mkdir(parents=True)
 
         if not config.audio_directories.audio_dir_true.exists():
             config.audio_directories.audio_dir_true.mkdir(parents=True)
-
-        if not config.audio_directories.audio_dir_false.parent.exists():
-            config.audio_directories.audio_dir_false.parent.mkdir(parents=True)
 
         if not config.audio_directories.audio_dir_false.exists():
             config.audio_directories.audio_dir_false.mkdir(parents=True)
