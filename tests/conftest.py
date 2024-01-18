@@ -8,6 +8,9 @@ from acoupi import data
 from acoupi.system.configs import CeleryConfig
 
 TEST_RECORDING = Path(__file__).parent / "data" / "audiofile_test1_myomys.wav"
+TEST_RECORDING_NOBAT: Path = (
+    Path(__file__).parent / "data" / "audiofile_test3_nobats.wav"
+)
 
 
 @pytest.fixture
@@ -19,6 +22,19 @@ def recording() -> data.Recording:
         datetime=datetime.datetime.now(),
         deployment=data.Deployment(
             name="test",
+        ),
+    )
+
+
+@pytest.fixture
+def notbat_recording() -> data.Recording:
+    return data.Recording(
+        path=TEST_RECORDING_NOBAT,
+        duration=3,
+        samplerate=192000,
+        datetime=datetime.datetime.now(),
+        deployment=data.Deployment(
+            name="test_nobats",
         ),
     )
 
