@@ -1,16 +1,13 @@
-import pytest
-from pathlib import Path
 import datetime
 import shutil
+from pathlib import Path
 
-from acoupi import components, data
-
-from acoupi.files import TEMP_PATH
+import pytest
+from acoupi import data
+from acoupi.files import TEMP_PATH, get_temp_files
 from acoupi.system.configs import CeleryConfig
 from celery import Celery
 from celery.worker import WorkController
-
-from acoupi.files import get_temp_files
 
 from acoupi_batdetect2.configuration import (
     AudioDirectories,
@@ -18,7 +15,16 @@ from acoupi_batdetect2.configuration import (
 )
 from acoupi_batdetect2.program import BatDetect2_Program
 
-# TEMP_PATH = Path("Users/audevuilliomenet/Documents")
+
+@pytest.fixture(autouse=True)
+def clear_tmp_files():
+    """Clear the temporary files.
+
+    Will be run before each test to ensure that the temporary files are
+    cleared before each test.
+    """
+    for file in get_temp_files():
+        file.unlink()
 
 
 @pytest.fixture
@@ -60,9 +66,7 @@ def nobat_temp_recording(
 
 
 @pytest.fixture
-def config(
-    tmp_path: Path,
-):
+def config(tmp_path: Path):
     config = BatDetect2_ConfigSchema(
         dbpath=tmp_path / "test.db",
         dbpath_messages=tmp_path / "test_messages.db",
@@ -78,7 +82,6 @@ def config(
 
 @pytest.fixture
 def program(
-    tmp_path: Path,
     config: BatDetect2_ConfigSchema,
     celery_app: Celery,
     celery_worker: WorkController,
@@ -94,7 +97,6 @@ def program(
     program.logger.setLevel("DEBUG")
     assert celery_app.conf["accept_content"] == ["pickle"]
     celery_worker.reload()
-
     return program
 
 
@@ -121,13 +123,9 @@ def test_management_tempfile_notindb(
     assert len(get_temp_files()) != 0
     assert config.audio_directories.audio_dir.exists()
     assert len(list(config.audio_directories.audio_dir.glob("*.wav"))) == 0
+    assert temp_recording.path is not None
 
-    assert (
-        program.store.get_recordings_temp_path(
-            temp_paths=[str(temp_recording.path)]
-        )
-        == []
-    )
+    assert program.store.get_recordings_by_path([temp_recording.path]) == []
 
     assert "file_management_task" in program.tasks
     output_file_task = program.tasks["file_management_task"].delay()
@@ -147,22 +145,16 @@ def test_management_tempfiles_notprocess(
     assert len(get_temp_files()) != 0
     assert config.audio_directories.audio_dir.exists()
     assert len(list(config.audio_directories.audio_dir.glob("*.wav"))) == 0
+    assert temp_recording.path is not None
 
     # Store test recording in the database to test the test.
     program.store.store_recording(temp_recording)
 
     # Check that the recording was stored in the database.
-    assert (
-        program.store.get_recordings_temp_path(
-            temp_paths=[str(temp_recording.path)]
-        )
-        != []
-    )
+    assert program.store.get_recordings_by_path([temp_recording.path]) != []
 
     # Retrieve the recording from the database.
-    recordings = program.store.get_recordings_temp_path(
-        temp_paths=[str(temp_recording.path)],
-    )
+    recordings = program.store.get_recordings_by_path([temp_recording.path])
 
     # Check that the recording was stored in the database but no detection exists.
     assert len(recordings) >= 1
@@ -179,8 +171,6 @@ def test_management_tempfile_positive_detection(
     config: BatDetect2_ConfigSchema,
     program: BatDetect2_Program,
     temp_recording: data.Recording,
-    celery_app: Celery,
-    celery_worker: WorkController,
 ):
     assert len(get_temp_files()) != 0
     assert config.audio_directories.audio_dir.exists()
@@ -192,14 +182,6 @@ def test_management_tempfile_positive_detection(
 
     # Store test recording in the database to test the test.
     program.store.store_recording(temp_recording)
-
-    # Instantiate the BatDetect2 program.
-    celery_config = CeleryConfig()
-    program = BatDetect2_Program(
-        program_config=config,
-        celery_config=celery_config,
-        app=celery_app,
-    )
 
     # Check that the program has a detection and file_management task.
     assert "detection_task" in program.tasks
@@ -224,8 +206,6 @@ def test_management_tempfile_negative_detection(
     config: BatDetect2_ConfigSchema,
     program: BatDetect2_Program,
     nobat_temp_recording: data.Recording,
-    celery_app: Celery,
-    celery_worker: WorkController,
 ):
     assert len(get_temp_files()) != 0
     assert config.audio_directories.audio_dir.exists()
@@ -237,14 +217,6 @@ def test_management_tempfile_negative_detection(
 
     # Store test recording in the database to test the test.
     program.store.store_recording(nobat_temp_recording)
-
-    # Instantiate the BatDetect2 program.
-    celery_config = CeleryConfig()
-    program = BatDetect2_Program(
-        program_config=config,
-        celery_config=celery_config,
-        app=celery_app,
-    )
 
     # Check that the program has a detection and file_management task.
     assert "detection_task" in program.tasks
@@ -263,5 +235,3 @@ def test_management_tempfile_negative_detection(
     assert (
         len(list(config.audio_directories.audio_dir_false.glob("*.wav"))) != 0
     )
-
-    return
