@@ -7,9 +7,11 @@ import pytest
 from acoupi import data
 from acoupi.system.configs import CeleryConfig
 
-TEST_RECORDING = Path(__file__).parent / "data" / "audiofile_test1_myomys.wav"
+TEST_RECORDING: Path = (
+    Path(__file__).parent / "data" / "audiofile_test1_myomys.wav"
+)
 TEST_RECORDING_NOBAT: Path = (
-    Path(__file__).parent / "data" / "audiofile_test3_nobats.wav"
+    Path(__file__).parent / "data" / "audiofile_test4_nobats.wav"
 )
 
 
