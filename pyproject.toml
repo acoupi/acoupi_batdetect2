@@ -22,7 +22,7 @@ build-backend = "pdm.backend"
 
 [tool.pdm.dev-dependencies]
 dev = [
-    "acoupi @ file:///home/pi/acoupi",
+    "acoupi @ file:///Users/audevuilliomenet/Documents/venv_acoupi/acoupi",
     "pytest>=7.4.3",
     "pytest-celery>=0.0.0",
 ]
