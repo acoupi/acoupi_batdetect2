@@ -46,15 +46,6 @@ class BatDetect2_Program(AcoupiProgram):
         """
         timezone = pytz.timezone(config.timezone)
 
-        if not config.dbpath.parent.exists():
-            config.dbpath.parent.touch()
-
-        if not config.dbpath.exists():
-            config.dbpath.touch()
-
-        if not config.dbpath_messages.exists():
-            config.dbpath_messages.touch()
-
         if not config.audio_directories.audio_dir.exists():
             config.audio_directories.audio_dir.mkdir(parents=True)
 
@@ -63,6 +54,12 @@ class BatDetect2_Program(AcoupiProgram):
 
         if not config.audio_directories.audio_dir_false.exists():
             config.audio_directories.audio_dir_false.mkdir(parents=True)
+
+        if not config.dbpath.exists():
+            config.dbpath.touch()
+
+        if not config.dbpath_messages.exists():
+            config.dbpath_messages.touch()
 
         self.store = components.SqliteStore(config.dbpath)
         self.message_store = components.SqliteMessageStore(
