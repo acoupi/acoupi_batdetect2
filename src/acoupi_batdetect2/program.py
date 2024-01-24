@@ -24,14 +24,9 @@ class BatDetect2_Program(AcoupiProgram):
                 queues=["recording"],
                 concurrency=1,
             ),
-            # AcoupiWorker(
-            #    name="detection_worker",
-            #    queues=["detection"],
-            #    concurrency=1,
-            # ),
             AcoupiWorker(
                 name="default_worker",
-                queues=["default"],
+                queues=["default", "celery"],
             ),
         ],
     )
@@ -231,15 +226,9 @@ class BatDetect2_Program(AcoupiProgram):
             queue="recording",
         )
 
-        # self.add_task(
-        #    function=detection_task,
-        #    schedule=datetime.timedelta(seconds=5),
-        #    queue="detection",
-        # )
-
         self.add_task(
             function=file_management_task,
-            schedule=datetime.timedelta(seconds=30),
+            schedule=datetime.timedelta(minutes=1),
             queue="default",
         )
 
