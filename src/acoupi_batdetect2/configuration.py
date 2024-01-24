@@ -40,7 +40,6 @@ class RecordingSchedule(BaseModel):
     end_recording: datetime.time = datetime.time(hour=20, minute=0, second=0)
 
 
-# class RecordingSaving(BaseModel):
 class SaveRecordingFilter(BaseModel):
     """Recording saving options configuration."""
 
@@ -101,6 +100,14 @@ class HTTP_MessageConfig(BaseModel):
     content_type: str = "application-json"
 
 
+# class CleanDetectionFilter(BaseModel):
+#     """Detection cleaning options configuration."""
+#
+#     detection_threshold: float = 0.2
+
+#     species_list: Optional[str] = None
+
+
 class BatDetect2_ConfigSchema(BaseModel):
     """BatDetect2 Configuration Schematic."""
 
@@ -116,7 +123,9 @@ class BatDetect2_ConfigSchema(BaseModel):
 
     timezone: str = "Europe/London"
 
-    microphone: MicrophoneConfig
+    microphone: MicrophoneConfig = Field(
+        default_factory=MicrophoneConfig,
+    )
 
     audio_config: AudioConfig = Field(
         default_factory=AudioConfig,
@@ -140,3 +149,7 @@ class BatDetect2_ConfigSchema(BaseModel):
     http_message_config: Optional[HTTP_MessageConfig] = Field(
         default_factory=HTTP_MessageConfig,
     )
+
+    # clean_detection: Optional[CleanDetectionFilter] = Field(
+    #     default_factory=CleanDetectionFilter,
+    # )
