@@ -3,39 +3,39 @@ import datetime
 from pathlib import Path
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
+from acoupi.components.audio_recorder import MicrophoneConfig
 
 """Default paramaters for Batdetect2 Program"""
-
-
-class MicrophoneConfig(BaseModel):
-    """Microphone configuration parameters."""
-
-    samplerate: int = 250_000
-
-    audio_channels: int = 1
-
-    device_index: int = 1
 
 
 class AudioConfig(BaseModel):
     """Audio and microphone configuration parameters."""
 
-    microphone_config: MicrophoneConfig = Field(
-        default_factory=MicrophoneConfig,
-    )
-
     audio_duration: int = 3
+    """Duration of each audio recording in seconds."""
+
+    recording_interval: int = 10
+    """Interval between each audio recording in seconds."""
 
     chunksize: int = 8192
 
-    recording_interval: int = 10
+    # @model_validator(mode="after")
+    # def validate_audio_duration(cls, value):
+    #     """Validate audio duration."""
+    #
+    #     if value.audio_duration > value.recording_interval:
+    #         raise ValueError(
+    #             "Audio duration cannot be greater than recording interval."
+    #         )
+    #
+    #     return value
 
 
 class RecordingSchedule(BaseModel):
     """Recording schedule config."""
 
-    start_recording: datetime.time = datetime.time(hour=10, minute=0, second=0)
+    start_recording: datetime.time = datetime.time(hour=5, minute=30, second=0)
 
     end_recording: datetime.time = datetime.time(hour=20, minute=0, second=0)
 
@@ -48,13 +48,13 @@ class SaveRecordingFilter(BaseModel):
 
     endtime: datetime.time = datetime.time(hour=20, minute=30, second=0)
 
-    before_dawndusk_duration: int = 0
+    before_dawndusk_duration: int = 10
 
-    after_dawndusk_duration: int = 0
+    after_dawndusk_duration: int = 10
 
-    frequency_duration: Optional[int] = None
+    frequency_duration: Optional[int] = 0
 
-    frequency_interval: Optional[int] = None
+    frequency_interval: Optional[int] = 0
 
     saving_threshold: float = 0.8
 
@@ -116,9 +116,7 @@ class BatDetect2_ConfigSchema(BaseModel):
 
     timezone: str = "Europe/London"
 
-    microphone: MicrophoneConfig = Field(
-        default_factory=MicrophoneConfig,
-    )
+    microphone: MicrophoneConfig
 
     audio_config: AudioConfig = Field(
         default_factory=AudioConfig,
