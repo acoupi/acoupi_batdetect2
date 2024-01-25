@@ -1,8 +1,8 @@
 """Batdetect2 Program."""
 import datetime
 from typing import Optional
-
 import pytz
+
 from acoupi import components, data, tasks
 from acoupi.programs.base import AcoupiProgram
 from acoupi.programs.workers import AcoupiWorker, WorkerConfig
@@ -54,7 +54,7 @@ class BatDetect2_Program(AcoupiProgram):
             samplerate=config.microphone.samplerate,
             audio_channels=config.microphone.audio_channels,
             chunksize=config.audio_config.chunksize,
-            device_name=config.microphone.device_name,  # type: ignore
+            device_name=config.microphone.device_name,
         )
         self.model = BatDetect2()
         self.file_manager = components.SaveRecordingManager(
@@ -168,9 +168,6 @@ class BatDetect2_Program(AcoupiProgram):
 
     def create_detection_cleaners(self, config: BatDetect2_ConfigSchema):
         """Create Detection Cleaners."""
-        # if not config.detection_cleaners:
-        #    # No detectioncleaners defined
-        #    return []
 
         detection_cleaners = []
 
@@ -182,6 +179,7 @@ class BatDetect2_Program(AcoupiProgram):
                 threshold=config.detection_threshold,
             ),
         )
+
         return detection_cleaners
 
     def create_file_filters(self, config: BatDetect2_ConfigSchema):
@@ -209,8 +207,8 @@ class BatDetect2_Program(AcoupiProgram):
 
         # Additional saving_file filters
         if (
-            recording_saving.frequency_duration is not None
-            and recording_saving.frequency_interval is not None
+            not recording_saving.frequency_duration != 0
+            and not recording_saving.frequency_interval != 0
         ):
             # This filter will only save recordings at a frequency defined
             # by the duration (length of time in which files are saved) and
@@ -222,7 +220,8 @@ class BatDetect2_Program(AcoupiProgram):
                 )
             )
 
-        if recording_saving.before_dawndusk_duration is not None:
+        # if recording_saving.before_dawndusk_duration is not None:
+        if not recording_saving.before_dawndusk_duration != 0:
             # This filter will only save recordings if the recording time is
             # within the duration (lenght of time in minutes) before dawn and dusk.
             saving_filters.append(
@@ -232,7 +231,8 @@ class BatDetect2_Program(AcoupiProgram):
                 )
             )
 
-        if recording_saving.after_dawndusk_duration is not None:
+        # if recording_saving.after_dawndusk_duration is not None:
+        if not recording_saving.after_dawndusk_duration != 0:
             # This filter will only save recordings if the recording time is
             # within the duration (lenght of time in minutes) after dawn and dusk.
             saving_filters.append(
@@ -242,7 +242,8 @@ class BatDetect2_Program(AcoupiProgram):
                 )
             )
 
-        if recording_saving.saving_threshold is not None:
+        # if recording_saving.saving_threshold is not None:
+        if not recording_saving.saving_threshold != 0:
             # This filter will only save recordings if the recording files
             # have a positive detection above the threshold.
             saving_filters.append(
@@ -290,45 +291,3 @@ class BatDetect2_Program(AcoupiProgram):
         raise UserWarning(
             "No Messenger defined - no data will be communicated."
         )
-
-    # def create_messenger(self, config: BatDetect2_ConfigSchema):
-    #    """Create Messengers - Send Detection Results."""
-
-    #    messenger_list = []
-
-    #    # HTTP Messenger
-    #    # This messenger will send detection results to a web server.
-    #    if config.http_message_config is not None:
-    #        messenger_list.append(
-    #            components.HTTPMessenger(
-    #                base_url=config.http_message_config.baseurl,
-    #                base_params={
-    #                    "client-id": config.http_message_config.client_id,
-    #                    "password": config.http_message_config.client_password,
-    #                },
-    #                headers={
-    #                    "Accept": config.http_message_config.content_type,
-    #                    "Authorization": config.http_message_config.api_key,
-    #                },
-    #            )
-    #        )
-
-    #    # MQTT Messenger
-    #    # This messenger will send detection results to a MQTT broker.
-    #    if config.mqtt_message_config is not None:
-    #        messenger_list.append(
-    #            components.MQTTMessenger(
-    #                host=config.mqtt_message_config.host,
-    #                port=config.mqtt_message_config.port,
-    #                password=config.mqtt_message_config.client_password,
-    #                username=config.mqtt_message_config.client_username,
-    #                topic=config.mqtt_message_config.topic,
-    #                clientid=config.mqtt_message_config.clientid,
-    #            )
-    #        )
-
-    #    raise UserWarning(
-    #        "No Messenger defined - no data will be communicated."
-    #    )
-
-    #    return messenger_list

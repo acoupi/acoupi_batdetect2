@@ -47,15 +47,15 @@ class SaveRecordingFilter(BaseModel):
 
     endtime: datetime.time = datetime.time(hour=20, minute=30, second=0)
 
-    before_dawndusk_duration: int = 10
+    before_dawndusk_duration: Optional[int] = 0
 
-    after_dawndusk_duration: int = 10
+    after_dawndusk_duration: Optional[int] = 0
 
     frequency_duration: Optional[int] = 0
 
     frequency_interval: Optional[int] = 0
 
-    saving_threshold: float = 0.8
+    saving_threshold: float = 0.4
 
 
 class AudioDirectories(BaseModel):
