@@ -3,14 +3,14 @@ import datetime
 from pathlib import Path
 from typing import Optional
 
-from pydantic import BaseModel, Field, model_validator
 from acoupi.components.audio_recorder import MicrophoneConfig
+from pydantic import BaseModel, Field, model_validator
 
 """Default paramaters for Batdetect2 Program"""
 
 
 class AudioConfig(BaseModel):
-    """Audio and microphone configuration parameters."""
+    """Audio recording configuration parameters."""
 
     audio_duration: int = 3
     """Duration of each audio recording in seconds."""
@@ -123,9 +123,7 @@ class BatDetect2_ConfigSchema(BaseModel):
 
     timezone: str = "Europe/London"
 
-    microphone: MicrophoneConfig = Field(
-        default_factory=MicrophoneConfig,
-    )
+    microphone_config: MicrophoneConfig
 
     audio_config: AudioConfig = Field(
         default_factory=AudioConfig,

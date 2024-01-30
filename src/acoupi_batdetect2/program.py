@@ -48,14 +48,15 @@ class BatDetect2_Program(AcoupiProgram):
         """
 
         self.validate_dirs(config)
-
+        microphone = config.microphone_config
         self.recorder = components.PyAudioRecorder(
             duration=config.audio_config.audio_duration,
-            samplerate=config.microphone.samplerate,
-            audio_channels=config.microphone.audio_channels,
             chunksize=config.audio_config.chunksize,
-            device_name=config.microphone.device_name,
+            samplerate=microphone.samplerate,
+            audio_channels=microphone.audio_channels,
+            device_name=microphone.device_name,
         )
+
         self.model = BatDetect2()
         self.file_manager = components.SaveRecordingManager(
             dirpath=config.audio_directories.audio_dir,
