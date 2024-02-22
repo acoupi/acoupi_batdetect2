@@ -21,12 +21,12 @@ class BatDetect2_Program(AcoupiProgram):
     worker_config: Optional[WorkerConfig] = WorkerConfig(
         workers=[
             AcoupiWorker(
-                name="recording_worker",
+                name="recording",
                 queues=["recording"],
                 concurrency=1,
             ),
             AcoupiWorker(
-                name="default_worker",
+                name="default",
                 queues=["default", "celery"],
             ),
         ],
@@ -106,14 +106,16 @@ class BatDetect2_Program(AcoupiProgram):
         """ Section 2 - Add Tasks to BatDetect2 Program """
         self.add_task(
             function=recording_task,
+            schedule=datetime.timedelta(
+                seconds=config.audio_config.recording_interval
+            ),
             callbacks=[detection_task],
-            schedule=datetime.timedelta(seconds=10),
             queue="recording",
         )
 
         self.add_task(
             function=file_management_task,
-            schedule=datetime.timedelta(minutes=1),
+            schedule=datetime.timedelta(seconds=30),
             queue="default",
         )
 
