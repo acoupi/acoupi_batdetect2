@@ -70,6 +70,7 @@ def config(tmp_path: Path):
     config = BatDetect2_ConfigSchema(
         dbpath=tmp_path / "test.db",
         dbpath_messages=tmp_path / "test_messages.db",
+        microphone_config=MicrophoneConfig,
         audio_directories=AudioDirectories(
             audio_dir=tmp_path / "audio",
             audio_dir_true=tmp_path / "audio_true",

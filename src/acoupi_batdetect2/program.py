@@ -1,4 +1,5 @@
 """Batdetect2 Program."""
+
 import datetime
 from typing import Optional
 import pytz

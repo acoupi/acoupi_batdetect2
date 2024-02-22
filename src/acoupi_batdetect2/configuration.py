@@ -1,4 +1,5 @@
 """Batdetect2 Program Configuration Options."""
+
 import datetime
 from pathlib import Path
 from typing import Optional
