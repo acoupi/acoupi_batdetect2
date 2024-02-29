@@ -118,12 +118,14 @@ class BatDetect2_Program(AcoupiProgram):
             function=file_management_task,
             schedule=datetime.timedelta(seconds=30),
             queue="default",
+            # delay_seconds=60,
         )
 
         self.add_task(
             function=send_data_task,
             schedule=crontab(minute="*/1"),
             queue="default",
+            # delay_seconds=60,
         )
 
     """ Section 3 - Configure Tasks based on BatDetect2 Configurations & User Inputs """
@@ -216,8 +218,8 @@ class BatDetect2_Program(AcoupiProgram):
 
         # Additional saving_file filters
         if (
-            not recording_saving.frequency_duration != 0
-            and not recording_saving.frequency_interval != 0
+            recording_saving.frequency_duration is not None
+            and recording_saving.frequency_interval is not None
         ):
             # This filter will only save recordings at a frequency defined
             # by the duration (length of time in which files are saved) and
@@ -229,8 +231,7 @@ class BatDetect2_Program(AcoupiProgram):
                 )
             )
 
-        # if recording_saving.before_dawndusk_duration is not None:
-        if not recording_saving.before_dawndusk_duration != 0:
+        if recording_saving.before_dawndusk_duration is not None:
             # This filter will only save recordings if the recording time is
             # within the duration (lenght of time in minutes) before dawn and dusk.
             saving_filters.append(
@@ -240,8 +241,7 @@ class BatDetect2_Program(AcoupiProgram):
                 )
             )
 
-        # if recording_saving.after_dawndusk_duration is not None:
-        if not recording_saving.after_dawndusk_duration != 0:
+        if recording_saving.after_dawndusk_duration is not None:
             # This filter will only save recordings if the recording time is
             # within the duration (lenght of time in minutes) after dawn and dusk.
             saving_filters.append(
@@ -251,8 +251,7 @@ class BatDetect2_Program(AcoupiProgram):
                 )
             )
 
-        # if recording_saving.saving_threshold is not None:
-        if not recording_saving.saving_threshold != 0:
+        if recording_saving.saving_threshold is not None:
             # This filter will only save recordings if the recording files
             # have a positive detection above the threshold.
             saving_filters.append(
