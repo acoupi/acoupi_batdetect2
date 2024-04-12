@@ -216,8 +216,8 @@ class BatDetect2_Program(AcoupiProgram):
 
         # Additional saving_file filters
         if (
-            not recording_saving.frequency_duration != 0
-            and not recording_saving.frequency_interval != 0
+            recording_saving.frequency_duration != 0
+            and recording_saving.frequency_interval != 0
         ):
             # This filter will only save recordings at a frequency defined
             # by the duration (length of time in which files are saved) and
@@ -230,7 +230,7 @@ class BatDetect2_Program(AcoupiProgram):
             )
 
         # if recording_saving.before_dawndusk_duration is not None:
-        if not recording_saving.before_dawndusk_duration != 0:
+        if recording_saving.before_dawndusk_duration != 0:
             # This filter will only save recordings if the recording time is
             # within the duration (lenght of time in minutes) before dawn and dusk.
             saving_filters.append(
@@ -241,7 +241,7 @@ class BatDetect2_Program(AcoupiProgram):
             )
 
         # if recording_saving.after_dawndusk_duration is not None:
-        if not recording_saving.after_dawndusk_duration != 0:
+        if recording_saving.after_dawndusk_duration != 0:
             # This filter will only save recordings if the recording time is
             # within the duration (lenght of time in minutes) after dawn and dusk.
             saving_filters.append(
@@ -252,7 +252,7 @@ class BatDetect2_Program(AcoupiProgram):
             )
 
         # if recording_saving.saving_threshold is not None:
-        if not recording_saving.saving_threshold != 0:
+        if recording_saving.saving_threshold != 0:
             # This filter will only save recordings if the recording files
             # have a positive detection above the threshold.
             saving_filters.append(
