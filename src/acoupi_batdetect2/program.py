@@ -118,12 +118,14 @@ class BatDetect2_Program(AcoupiProgram):
             function=file_management_task,
             schedule=datetime.timedelta(seconds=30),
             queue="default",
+            # delay_seconds=60,
         )
 
         self.add_task(
             function=send_data_task,
             schedule=crontab(minute="*/1"),
             queue="default",
+            # delay_seconds=60,
         )
 
     """ Section 3 - Configure Tasks based on BatDetect2 Configurations & User Inputs """
