@@ -121,7 +121,8 @@ class BatDetect2_Program(AcoupiProgram):
 
         self.add_task(
             function=send_data_task,
-            schedule=crontab(minute="*/1"),
+            #schedule=crontab(minute="*/1"),
+            schedule=datetime.timedelta(seconds=10),
         )
 
     """ Section 3 - Configure Tasks based on BatDetect2 Configurations & User Inputs """
@@ -268,21 +269,7 @@ class BatDetect2_Program(AcoupiProgram):
     def create_messenger(self, config: BatDetect2_ConfigSchema):
         """Create Messengers - Send Detection Results."""
 
-        # HTTP Messenger
-        # This messenger will send detection results to a web server.
-        if config.http_message_config is not None:
-            return components.HTTPMessenger(
-                base_url=config.http_message_config.baseurl,
-                base_params={
-                    "client-id": config.http_message_config.client_id,
-                    "password": config.http_message_config.client_password,
-                },
-                headers={
-                    "Accept": config.http_message_config.content_type,
-                    "Authorization": config.http_message_config.api_key,
-                },
-            )
-
+        
         # MQTT Messenger
         # This messenger will send detection results to a MQTT broker.
         if config.mqtt_message_config is not None:
@@ -293,6 +280,22 @@ class BatDetect2_Program(AcoupiProgram):
                 username=config.mqtt_message_config.client_username,
                 topic=config.mqtt_message_config.topic,
                 clientid=config.mqtt_message_config.clientid,
+            )
+
+        # HTTP Messenger
+        # This messenger will send detection results to a web server.
+        else:
+            #config.http_message_config is not None:
+            return components.HTTPMessenger(
+                base_url=config.http_message_config.baseurl,
+                base_params={
+                    "client-id": config.http_message_config.client_id,
+                    "password": config.http_message_config.client_password,
+                },
+                headers={
+                    "Accept": config.http_message_config.content_type,
+                    "Authorization": config.http_message_config.api_key,
+                },
             )
 
         raise UserWarning(
