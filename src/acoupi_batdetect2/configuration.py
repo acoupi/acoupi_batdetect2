@@ -16,7 +16,7 @@ class AudioConfig(BaseModel):
     audio_duration: int = 3
     """Duration of each audio recording in seconds."""
 
-    recording_interval: int = 10
+    recording_interval: int = 5
     """Interval between each audio recording in seconds."""
 
     chunksize: int = 8192
@@ -72,13 +72,13 @@ class AudioDirectories(BaseModel):
 class MQTT_MessageConfig(BaseModel):
     """MQTT configuration to send messages."""
 
-    host: str = "localhost"
+    host: str = "default_host"
 
     port: int = 1884
 
-    client_password: str = "guest"
+    client_username: str = "guest_username"
 
-    client_username: str = "guest"
+    client_password: str = "guest_password"
 
     topic: str = "mqtt-topic"
 
@@ -92,11 +92,11 @@ class HTTP_MessageConfig(BaseModel):
 
     baseurl: str = "base-url"
 
-    client_password: str = "guest"
+    client_password: str = "guest_password"
 
-    client_id: str = "guest"
+    client_id: str = "guest_clientid"
 
-    api_key: str = "guest"
+    api_key: str = "guest_apikey"
 
     content_type: str = "application-json"
 
