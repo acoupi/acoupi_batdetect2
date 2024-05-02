@@ -269,35 +269,41 @@ class BatDetect2_Program(AcoupiProgram):
     def create_messenger(self, config: BatDetect2_ConfigSchema):
         """Create Messengers - Send Detection Results."""
 
-        
+        mqtt_default_config = config.mqtt_message_config
+        http_default_config = config.http_message_config
+
         # MQTT Messenger
         # This messenger will send detection results to a MQTT broker.
         if config.mqtt_message_config is not None:
-            return components.MQTTMessenger(
-                host=config.mqtt_message_config.host,
-                port=config.mqtt_message_config.port,
-                password=config.mqtt_message_config.client_password,
-                username=config.mqtt_message_config.client_username,
-                topic=config.mqtt_message_config.topic,
-                clientid=config.mqtt_message_config.clientid,
-            )
+            if config.mqtt_message_config.client_password != "guest_password":
+                return components.MQTTMessenger(
+                    host=config.mqtt_message_config.host,
+                    port=config.mqtt_message_config.port,
+                    password=config.mqtt_message_config.client_password,
+                    username=config.mqtt_message_config.client_username,
+                    topic=config.mqtt_message_config.topic,
+                    clientid=config.mqtt_message_config.clientid,
+                )
 
         # HTTP Messenger
         # This messenger will send detection results to a web server.
-        else:
-            #config.http_message_config is not None:
-            return components.HTTPMessenger(
-                base_url=config.http_message_config.baseurl,
-                base_params={
-                    "client-id": config.http_message_config.client_id,
-                    "password": config.http_message_config.client_password,
-                },
-                headers={
-                    "Accept": config.http_message_config.content_type,
-                    "Authorization": config.http_message_config.api_key,
-                },
-            )
+        if config.http_message_config is not None:
+            if config.http_message_config.client_password != "guest_password":
+                return components.HTTPMessenger(
+                    base_url=config.http_message_config.baseurl,
+                    base_params={
+                        "client-id": config.http_message_config.client_id,
+                        "password": config.http_message_config.client_password,
+                    },
+                    headers={
+                        "Accept": config.http_message_config.content_type,
+                        "Authorization": config.http_message_config.api_key,
+                    },
+                )
 
-        raise UserWarning(
-            "No Messenger defined - no data will be communicated."
-        )
+        else:
+            raise UserWarning(
+                "No Messenger defined - no data will be communicated."
+            )
+        
+        return None
