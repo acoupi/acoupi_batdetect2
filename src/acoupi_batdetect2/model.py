@@ -29,7 +29,7 @@ class BatDetect2(types.Model):
         # Convert the raw detections to a list of detections
         detections = [
             data.Detection(
-                probability=detection["det_prob"],
+                detection_probability=detection["det_prob"],
                 location=data.BoundingBox.from_coordinates(
                     detection["start_time"],
                     detection["low_freq"],
@@ -42,19 +42,13 @@ class BatDetect2(types.Model):
                             key="species",
                             value=detection["class"],
                         ),
-                        probability=detection["class_prob"],
-                    ),
-                    data.PredictedTag(
-                        tag=data.Tag(
-                            key="event",
-                            value=detection["event"],
-                        ),
+                        classification_probability=detection["class_prob"],
                     ),
                 ],
             )
             for detection in raw_detections
         ]
-
+    
         return data.ModelOutput(
             name_model="BatDetect2",
             recording=recording,
