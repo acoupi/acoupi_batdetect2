@@ -69,6 +69,18 @@ class AudioDirectories(BaseModel):
     audio_dir_false: Path = Path.home() / "storages" / "recordings" / "no_bats"
 
 
+class DetectionsSummariser(BaseModel):
+    """Summariser configuration."""
+
+    summary_frequency: float = 2 * 60  # interval in seconds
+
+    threshold_lowband: float = 0.5
+
+    threshold_midband: float = 0.7
+
+    threshold_highband: float = 0.9
+
+
 class MQTT_MessageConfig(BaseModel):
     """MQTT configuration to send messages."""
 
@@ -140,6 +152,10 @@ class BatDetect2_ConfigSchema(BaseModel):
 
     audio_directories: AudioDirectories = Field(
         default_factory=AudioDirectories,
+    )
+
+    summariser_config: Optional[DetectionsSummariser] = Field(
+        default_factory=DetectionsSummariser,
     )
 
     mqtt_message_config: Optional[MQTT_MessageConfig] = Field(

@@ -87,7 +87,9 @@ class BatDetect2_Program(AcoupiProgram):
             message_store=self.message_store,
             logger=self.logger.getChild("detection"),
             output_cleaners=self.create_detection_cleaners(config),
-            message_factories=[components.FullModelOutputMessageBuilder()],
+            message_factories=[],
+            # message_factories=[components.FullModelOutputMessageBuilder()],
+            # message_factories=self.create_message_factories(config),
         )
 
         # Step 3 - Files Management Task
@@ -96,6 +98,13 @@ class BatDetect2_Program(AcoupiProgram):
             logger=self.logger.getChild("file_management"),
             file_manager=self.file_manager,
             file_filters=self.create_file_filters(config),
+        )
+
+        summary_task = tasks.generate_summariser_task(
+            summariser=self.create_summariser(config),
+            store=self.store,
+            message_store=self.message_store,
+            logger=self.logger.getChild("summary"),
         )
 
         # Step 4 - Send Data Task
@@ -120,8 +129,16 @@ class BatDetect2_Program(AcoupiProgram):
         )
 
         self.add_task(
+            function=summary_task,
+            schedule=datetime.timedelta(
+                seconds=config.summariser.summary_interval
+            ),
+            # schedule=datetime.timedelta(seconds=30),
+        )
+
+        self.add_task(
             function=send_data_task,
-            #schedule=crontab(minute="*/1"),
+            # schedule=crontab(minute="*/1"),
             schedule=datetime.timedelta(seconds=10),
         )
 
@@ -266,6 +283,27 @@ class BatDetect2_Program(AcoupiProgram):
 
         return saving_filters
 
+    def create_summariser(self, config: BatDetect2_ConfigSchema):
+        """ "Create Summariser."""
+
+        summariser = []
+
+        # Main Summariser will send summary of detections at regular intervals.
+        if not config.summariser:
+            # No summariser defined
+            return []
+
+        summariser.append(
+            components.DetectionsSummariser(
+                interval=config.summariser.summary_interval,
+                threshold_lowband=config.summariser.threshold_lowband,
+                threshold_midband=config.summariser.threshold_midband,
+                threshold_highband=config.summariser.threshold_highband,
+            )
+        )
+
+        return summariser
+
     def create_messenger(self, config: BatDetect2_ConfigSchema):
         """Create Messengers - Send Detection Results."""
 
@@ -305,5 +343,5 @@ class BatDetect2_Program(AcoupiProgram):
             raise UserWarning(
                 "No Messenger defined - no data will be communicated."
             )
-        
+
         return None
