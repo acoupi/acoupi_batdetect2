@@ -71,6 +71,10 @@ class BatDetect2_Program(AcoupiProgram):
             config.dbpath_messages
         )
 
+        self.summariser = components.DetectionsSummariser(
+            interval=config.summariser.interval,
+        )
+
         """ Section 1 - Define Tasks for the BatDetect2 Program """
         # Step 1 - Audio Recordings Task
         recording_task = tasks.generate_recording_task(
@@ -101,7 +105,8 @@ class BatDetect2_Program(AcoupiProgram):
         )
 
         summary_task = tasks.generate_summariser_task(
-            summariser=self.create_summariser(config),
+            #summariser=self.create_summariser(config),
+            summariser=self.summariser,
             store=self.store,
             message_store=self.message_store,
             logger=self.logger.getChild("summary"),
@@ -131,7 +136,7 @@ class BatDetect2_Program(AcoupiProgram):
         self.add_task(
             function=summary_task,
             schedule=datetime.timedelta(
-                seconds=config.summariser.summary_interval
+                seconds=config.summariser.interval
             ),
             # schedule=datetime.timedelta(seconds=30),
         )
@@ -295,10 +300,7 @@ class BatDetect2_Program(AcoupiProgram):
 
         summariser.append(
             components.DetectionsSummariser(
-                interval=config.summariser.summary_interval,
-                threshold_lowband=config.summariser.threshold_lowband,
-                threshold_midband=config.summariser.threshold_midband,
-                threshold_highband=config.summariser.threshold_highband,
+                interval=config.summariser.interval,
             )
         )
 
