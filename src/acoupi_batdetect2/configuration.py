@@ -72,12 +72,7 @@ class AudioDirectories(BaseModel):
 class Summariser(BaseModel):
     """Summariser configuration."""
 
-    interval: float = 10  # interval in seconds
-
-    #threshold_lowband: Optional[float] = 0.5
-    #threshold_midband: Optional[float] = 0.7
-
-    #threshold_highband: Optional[float] = 0.9
+    interval: float = 0.5*60  # interval in seconds
 
 
 class MQTT_MessageConfig(BaseModel):
