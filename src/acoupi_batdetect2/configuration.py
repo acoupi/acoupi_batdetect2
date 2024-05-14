@@ -74,6 +74,12 @@ class Summariser(BaseModel):
 
     interval: float = 0.5*60  # interval in seconds
 
+    #low_band_threshold: Optional[float] = 0.5
+
+    #mid_band_threshold: Optional[float] = 0.7
+
+    #high_band_threshold: Optional[float] = 0.9
+
 
 class MQTT_MessageConfig(BaseModel):
     """MQTT configuration to send messages."""

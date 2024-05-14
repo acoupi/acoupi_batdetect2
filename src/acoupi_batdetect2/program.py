@@ -91,7 +91,7 @@ class BatDetect2_Program(AcoupiProgram):
             message_store=self.message_store,
             logger=self.logger.getChild("detection"),
             output_cleaners=self.create_detection_cleaners(config),
-            message_factories=[],
+            message_factories=[components.FullModelOutputMessageBuilder()],
             # message_factories=[components.FullModelOutputMessageBuilder()],
             # message_factories=self.create_message_factories(config),
         )
@@ -107,6 +107,7 @@ class BatDetect2_Program(AcoupiProgram):
         summary_task = tasks.generate_summariser_task(
             #summariser=self.create_summariser(config),
             summariser=self.summariser,
+            message_factory=components.SummaryMessageBuilder(),
             store=self.store,
             message_store=self.message_store,
             logger=self.logger.getChild("summary"),
@@ -138,7 +139,6 @@ class BatDetect2_Program(AcoupiProgram):
             schedule=datetime.timedelta(
                 seconds=config.summariser.interval
             ),
-            # schedule=datetime.timedelta(seconds=30),
         )
 
         self.add_task(
@@ -303,6 +303,20 @@ class BatDetect2_Program(AcoupiProgram):
                 interval=config.summariser.interval,
             )
         )
+        
+        #if (
+        #    summariser.low_band_threshold != 0
+        #    and summariser.mid_band_threshold != 0 
+        #    and summariser.high_band_threshold != 0
+        #):
+        #    summariser.append(
+        #        components.ThresholdsDetectionsSummariser(
+        #            interval=config.summariser.interval,
+        #            low_band_threshold=config.summariser.low_band_threshold,
+        #            mid_band_threshold=config.summariser.mid_band_threshold,
+        #            high_band_threshold=config.summariser.high_band_threshold,
+        #        )
+        #    )
 
         return summariser
 
