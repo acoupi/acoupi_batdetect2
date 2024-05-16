@@ -73,7 +73,6 @@ class BatDetect2_Program(AcoupiProgram):
             config.dbpath_messages
         )
 
-
         """ Section 1 - Define Tasks for the BatDetect2 Program """
         # Step 1 - Audio Recordings Task
         recording_task = tasks.generate_recording_task(
@@ -111,7 +110,7 @@ class BatDetect2_Program(AcoupiProgram):
         # Step 4 - Send Data Task
         send_data_task = tasks.generate_send_data_task(
             message_store=self.message_store,
-            messenger=self.create_messenger(config),
+            messenger=self.create_messenger(messengers),
         )
 
         """ Section 2 - Add Tasks to BatDetect2 Program """
@@ -131,9 +130,7 @@ class BatDetect2_Program(AcoupiProgram):
 
         self.add_task(
             function=summary_task,
-            schedule=datetime.timedelta(
-                seconds=config.summariser.interval
-            ),
+            schedule=datetime.timedelta(seconds=config.summariser.interval),
         )
 
         self.add_task(
@@ -292,9 +289,7 @@ class BatDetect2_Program(AcoupiProgram):
         summariser_config = config.summariser
 
         """Default Summariser: Return mean, max, min and count of detections of a time interval."""
-        if (
-            summariser_config.interval != 0
-        ):
+        if summariser_config.interval != 0:
             summarisers.append(
                 components.StatisticsDetectionsSummariser(
                     interval=summariser_config.interval,
@@ -318,18 +313,26 @@ class BatDetect2_Program(AcoupiProgram):
                     high_band_threshold=summariser_config.high_band_threshold,
                 )
             )
-        
-        return summarisers
 
+        return summarisers
 
     def create_messenger(self, config: BatDetect2_ConfigSchema):
         """Create Messengers - Send Detection Results."""
 
-        # MQTT Messenger
-        # This messenger will send detection results to a MQTT broker.
-        if config.mqtt_message_config is not None:
-            if config.mqtt_message_config.client_password != "guest_password":
-                return components.MQTTMessenger(
+        # Main Messenger will send messages to remote server.
+        if not config.mqtt_message_config and not config.http_message_config:
+            # No messenger defined
+            return []
+
+        messengers = []
+
+        """MQTT Messenger - Will send messages to a MQTT broker."""
+        if (
+            config.mqtt_message_config is not None
+            and config.mqtt_message_config.client_password != "guest_password"
+        ):
+            messengers.append(
+                components.MQTTMessenger(
                     host=config.mqtt_message_config.host,
                     port=config.mqtt_message_config.port,
                     password=config.mqtt_message_config.client_password,
@@ -337,12 +340,14 @@ class BatDetect2_Program(AcoupiProgram):
                     topic=config.mqtt_message_config.topic,
                     clientid=config.mqtt_message_config.clientid,
                 )
+            )
 
-        # HTTP Messenger
-        # This messenger will send detection results to a web server.
-        if config.http_message_config is not None:
-            if config.http_message_config.client_password != "guest_password":
-                return components.HTTPMessenger(
+        if (
+            config.http_message_config is not None
+            and config.http_message_config.client_password != "guest_password"
+        ):
+            messengers.append(
+                components.HTTPMessenger(
                     base_url=config.http_message_config.baseurl,
                     base_params={
                         "client-id": config.http_message_config.client_id,
@@ -353,10 +358,6 @@ class BatDetect2_Program(AcoupiProgram):
                         "Authorization": config.http_message_config.api_key,
                     },
                 )
-
-        else:
-            raise UserWarning(
-                "No Messenger defined - no data will be communicated."
             )
 
-        return None
+        return messengers
