@@ -38,14 +38,16 @@ class BatDetect2_Program(AcoupiProgram):
         Section 1 - Define Tasks for the BatDetect2 Program
             1. Create Recording Task
             2. Create Detection Task
-            3. Create Fine Management Task
-            4. Create Message Task
+            3. Create File Management Task
+            4. Create Summary Task
+            5. Create Message Task
         Section 2 - Add Tasks to BatDetect2 Program
         Section 3 - Configure Tasks based on BatDetect2 Configurations & User Inputs
             1. Store Directories
             2. Recording Conditions
             3. File Filters
-            4. Messengers
+            4. Summarisers
+            5. Messengers
         """
 
         self.validate_dirs(config)
@@ -71,9 +73,6 @@ class BatDetect2_Program(AcoupiProgram):
             config.dbpath_messages
         )
 
-        self.summariser = components.StatisticsDetectionsSummariser(
-            interval=config.summariser.interval,
-        )
 
         """ Section 1 - Define Tasks for the BatDetect2 Program """
         # Step 1 - Audio Recordings Task
@@ -92,8 +91,7 @@ class BatDetect2_Program(AcoupiProgram):
             logger=self.logger.getChild("detection"),
             output_cleaners=self.create_detection_cleaners(config),
             message_factories=[components.FullModelOutputMessageBuilder()],
-            # message_factories=[components.FullModelOutputMessageBuilder()],
-            # message_factories=self.create_message_factories(config),
+            # message_factories=[],
         )
 
         # Step 3 - Files Management Task
@@ -105,10 +103,7 @@ class BatDetect2_Program(AcoupiProgram):
         )
 
         summary_task = tasks.generate_summariser_task(
-            #summariser=self.create_summariser(config),
-            summariser=self.summariser,
-            message_factory=components.SummaryMessageBuilder(),
-            store=self.store,
+            summarisers=self.create_summariser(config),
             message_store=self.message_store,
             logger=self.logger.getChild("summary"),
         )
@@ -250,7 +245,6 @@ class BatDetect2_Program(AcoupiProgram):
                 )
             )
 
-        # if recording_saving.before_dawndusk_duration is not None:
         if recording_saving.before_dawndusk_duration != 0:
             # This filter will only save recordings if the recording time is
             # within the duration (lenght of time in minutes) before dawn and dusk.
@@ -261,7 +255,6 @@ class BatDetect2_Program(AcoupiProgram):
                 )
             )
 
-        # if recording_saving.after_dawndusk_duration is not None:
         if recording_saving.after_dawndusk_duration != 0:
             # This filter will only save recordings if the recording time is
             # within the duration (lenght of time in minutes) after dawn and dusk.
@@ -272,7 +265,6 @@ class BatDetect2_Program(AcoupiProgram):
                 )
             )
 
-        # if recording_saving.saving_threshold is not None:
         if recording_saving.saving_threshold != 0:
             # This filter will only save recordings if the recording files
             # have a positive detection above the threshold.
@@ -291,40 +283,47 @@ class BatDetect2_Program(AcoupiProgram):
     def create_summariser(self, config: BatDetect2_ConfigSchema):
         """ "Create Summariser."""
 
-        summariser = []
-
         # Main Summariser will send summary of detections at regular intervals.
         if not config.summariser:
             # No summariser defined
             return []
 
-        summariser.append(
-            components.StatisticsDetectionsSummariser(
-                interval=config.summariser.interval,
-            )
-        )
-        
-        #if (
-        #    summariser.low_band_threshold != 0
-        #    and summariser.mid_band_threshold != 0 
-        #    and summariser.high_band_threshold != 0
-        #):
-        #    summariser.append(
-        #        components.ThresholdsDetectionsSummariser(
-        #            interval=config.summariser.interval,
-        #            low_band_threshold=config.summariser.low_band_threshold,
-        #            mid_band_threshold=config.summariser.mid_band_threshold,
-        #            high_band_threshold=config.summariser.high_band_threshold,
-        #        )
-        #    )
+        summarisers = []
+        summariser_config = config.summariser
 
-        return summariser
+        """Default Summariser: Return mean, max, min and count of detections of a time interval."""
+        if (
+            summariser_config.interval != 0
+        ):
+            summarisers.append(
+                components.StatisticsDetectionsSummariser(
+                    interval=summariser_config.interval,
+                    store=self.store,
+                )
+            )
+
+        """Threshold Summariser: Return count and mean of detections in threshold bands 
+        for a specific time interval, if users set values for threshold bands."""
+        if (
+            summariser_config.low_band_threshold != 0
+            and summariser_config.mid_band_threshold != 0
+            and summariser_config.high_band_threshold != 0
+        ):
+            summarisers.append(
+                components.ThresholdsDetectionsSummariser(
+                    interval=summariser_config.interval,
+                    store=self.store,
+                    low_band_threshold=summariser_config.low_band_threshold,
+                    mid_band_threshold=summariser_config.mid_band_threshold,
+                    high_band_threshold=summariser_config.high_band_threshold,
+                )
+            )
+        
+        return summarisers
+
 
     def create_messenger(self, config: BatDetect2_ConfigSchema):
         """Create Messengers - Send Detection Results."""
-
-        mqtt_default_config = config.mqtt_message_config
-        http_default_config = config.http_message_config
 
         # MQTT Messenger
         # This messenger will send detection results to a MQTT broker.

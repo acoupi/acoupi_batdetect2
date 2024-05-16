@@ -19,7 +19,7 @@ class AudioConfig(BaseModel):
     recording_interval: int = 5
     """Interval between each audio recording in seconds."""
 
-    chunksize: int = 8192
+    #chunksize: int = 8192
 
     # @model_validator(mode="after")
     # def validate_audio_duration(cls, value):
@@ -74,11 +74,11 @@ class Summariser(BaseModel):
 
     interval: float = 0.5*60  # interval in seconds
 
-    #low_band_threshold: Optional[float] = 0.5
+    low_band_threshold: Optional[float] = 0.0
 
-    #mid_band_threshold: Optional[float] = 0.7
+    mid_band_threshold: Optional[float] = 0.0
 
-    #high_band_threshold: Optional[float] = 0.9
+    high_band_threshold: Optional[float] = 0.0
 
 
 class MQTT_MessageConfig(BaseModel):
@@ -111,14 +111,6 @@ class HTTP_MessageConfig(BaseModel):
     api_key: str = "guest_apikey"
 
     content_type: str = "application-json"
-
-
-# class CleanDetectionFilter(BaseModel):
-#     """Detection cleaning options configuration."""
-#
-#     detection_threshold: float = 0.2
-
-#     species_list: Optional[str] = None
 
 
 class BatDetect2_ConfigSchema(BaseModel):
@@ -154,7 +146,7 @@ class BatDetect2_ConfigSchema(BaseModel):
         default_factory=AudioDirectories,
     )
 
-    summariser: Summariser = Field(
+    summariser: Optional[Summariser] = Field(
         default_factory=Summariser,
     )
 
@@ -164,7 +156,3 @@ class BatDetect2_ConfigSchema(BaseModel):
     http_message_config: Optional[HTTP_MessageConfig] = Field(
         default_factory=HTTP_MessageConfig,
     )
-
-    # clean_detection: Optional[CleanDetectionFilter] = Field(
-    #     default_factory=CleanDetectionFilter,
-    # )
