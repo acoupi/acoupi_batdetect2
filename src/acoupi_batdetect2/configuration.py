@@ -73,7 +73,7 @@ class AudioDirectories(BaseModel):
 class Summariser(BaseModel):
     """Summariser configuration."""
 
-    interval: float = 0.5*60  # interval in seconds
+    interval: float = 1.0  # interval in minutes
 
     low_band_threshold: Optional[float] = 0.0
 

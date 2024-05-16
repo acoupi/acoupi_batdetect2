@@ -73,6 +73,11 @@ class BatDetect2_Program(AcoupiProgram):
             config.dbpath_messages
         )
 
+        self.summariser = compoments.StatisticsDetectionsSummariser(
+            store=self.store,
+            interval=config.summariser.interval,
+        )
+
         """ Section 1 - Define Tasks for the BatDetect2 Program """
         # Step 1 - Audio Recordings Task
         recording_task = tasks.generate_recording_task(
@@ -102,7 +107,8 @@ class BatDetect2_Program(AcoupiProgram):
         )
 
         summary_task = tasks.generate_summariser_task(
-            summarisers=self.create_summariser(config),
+            #summarisers=self.create_summariser(config),
+            summarisers=[self.summariser],
             message_store=self.message_store,
             logger=self.logger.getChild("summary"),
         )
@@ -110,7 +116,7 @@ class BatDetect2_Program(AcoupiProgram):
         # Step 4 - Send Data Task
         send_data_task = tasks.generate_send_data_task(
             message_store=self.message_store,
-            messengers=self.create_messenger(messengers),
+            messengers=self.create_messenger(config),
         )
 
         """ Section 2 - Add Tasks to BatDetect2 Program """
@@ -130,7 +136,7 @@ class BatDetect2_Program(AcoupiProgram):
 
         self.add_task(
             function=summary_task,
-            schedule=datetime.timedelta(seconds=config.summariser.interval),
+            schedule=datetime.timedelta(minutes=config.summariser.interval),
         )
 
         self.add_task(
@@ -289,11 +295,13 @@ class BatDetect2_Program(AcoupiProgram):
         summariser_config = config.summariser
 
         """Default Summariser: Return mean, max, min and count of detections of a time interval."""
-        if summariser_config.interval != 0:
+        if (
+            summariser_config.interval != 0
+        ):
             summarisers.append(
                 components.StatisticsDetectionsSummariser(
-                    interval=summariser_config.interval,
                     store=self.store,
+                    interval=summariser_config.interval,
                 )
             )
 
@@ -306,8 +314,8 @@ class BatDetect2_Program(AcoupiProgram):
         ):
             summarisers.append(
                 components.ThresholdsDetectionsSummariser(
-                    interval=summariser_config.interval,
                     store=self.store,
+                    interval=summariser_config.interval,
                     low_band_threshold=summariser_config.low_band_threshold,
                     mid_band_threshold=summariser_config.mid_band_threshold,
                     high_band_threshold=summariser_config.high_band_threshold,
