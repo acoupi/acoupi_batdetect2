@@ -73,10 +73,6 @@ class BatDetect2_Program(AcoupiProgram):
             config.dbpath_messages
         )
 
-        self.summariser = components.StatisticsDetectionsSummariser(
-            store=self.store,
-            interval=config.summariser.interval,
-        )
 
         """ Section 1 - Define Tasks for the BatDetect2 Program """
         # Step 1 - Audio Recordings Task
@@ -107,8 +103,7 @@ class BatDetect2_Program(AcoupiProgram):
         )
 
         summary_task = tasks.generate_summariser_task(
-            #summarisers=self.create_summariser(config),
-            summarisers=[self.summariser],
+            summarisers=self.create_summariser(config),
             message_store=self.message_store,
             logger=self.logger.getChild("summary"),
         )
@@ -117,6 +112,7 @@ class BatDetect2_Program(AcoupiProgram):
         send_data_task = tasks.generate_send_data_task(
             message_store=self.message_store,
             messengers=self.create_messenger(config),
+            logger=self.logger.getChild("messaging"),
         )
 
         """ Section 2 - Add Tasks to BatDetect2 Program """
@@ -136,7 +132,7 @@ class BatDetect2_Program(AcoupiProgram):
 
         self.add_task(
             function=summary_task,
-            schedule=datetime.timedelta(minutes=config.summariser.interval),
+            schedule=datetime.timedelta(minutes=config.summariser_config.interval),
         )
 
         self.add_task(
@@ -287,17 +283,17 @@ class BatDetect2_Program(AcoupiProgram):
         """ "Create Summariser."""
 
         # Main Summariser will send summary of detections at regular intervals.
-        if not config.summariser:
-            # No summariser defined
+        if not config.summariser_config:
+            raise UserWarning(
+                "No saving filters defined - no files will be saved."
+            )
             return []
 
         summarisers = []
-        summariser_config = config.summariser
+        summariser_config = config.summariser_config
 
         """Default Summariser: Return mean, max, min and count of detections of a time interval."""
-        if (
-            summariser_config.interval != 0
-        ):
+        if summariser_config.interval != 0:
             summarisers.append(
                 components.StatisticsDetectionsSummariser(
                     store=self.store,
@@ -329,7 +325,9 @@ class BatDetect2_Program(AcoupiProgram):
 
         # Main Messenger will send messages to remote server.
         if not config.mqtt_message_config and not config.http_message_config:
-            # No messenger defined
+            raise UserWarning(
+                "No messengers defined - no messages will be sent."
+            )
             return []
 
         messengers = []

@@ -147,7 +147,7 @@ class BatDetect2_ConfigSchema(BaseModel):
         default_factory=AudioDirectories,
     )
 
-    summariser: Optional[Summariser] = Field(
+    summariser_config: Optional[Summariser] = Field(
         default_factory=Summariser,
     )
 
