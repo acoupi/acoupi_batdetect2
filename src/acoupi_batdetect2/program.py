@@ -73,7 +73,7 @@ class BatDetect2_Program(AcoupiProgram):
             config.dbpath_messages
         )
 
-        self.summariser = compoments.StatisticsDetectionsSummariser(
+        self.summariser = components.StatisticsDetectionsSummariser(
             store=self.store,
             interval=config.summariser.interval,
         )
