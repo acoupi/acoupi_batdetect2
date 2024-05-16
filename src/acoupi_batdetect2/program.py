@@ -110,7 +110,7 @@ class BatDetect2_Program(AcoupiProgram):
         # Step 4 - Send Data Task
         send_data_task = tasks.generate_send_data_task(
             message_store=self.message_store,
-            messenger=self.create_messenger(messengers),
+            messengers=self.create_messenger(messengers),
         )
 
         """ Section 2 - Add Tasks to BatDetect2 Program """

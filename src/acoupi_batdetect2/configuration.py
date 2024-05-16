@@ -19,7 +19,8 @@ class AudioConfig(BaseModel):
     recording_interval: int = 5
     """Interval between each audio recording in seconds."""
 
-    #chunksize: int = 8192
+    chunksize: int = 8192
+    """Chunksize of audio recording."""
 
     # @model_validator(mode="after")
     # def validate_audio_duration(cls, value):
