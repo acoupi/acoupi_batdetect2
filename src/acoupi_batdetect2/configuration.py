@@ -2,10 +2,12 @@
 
 import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Annotated, Optional
 
 from acoupi.components.audio_recorder import MicrophoneConfig
-from pydantic import BaseModel, Field, model_validator
+from acoupi.files import TEMP_PATH
+from acoupi.programs import NoUserPrompt
+from pydantic import BaseModel, Field
 
 """Default paramaters for Batdetect2 Program"""
 
@@ -49,15 +51,15 @@ class SaveRecordingFilter(BaseModel):
 
     endtime: datetime.time = datetime.time(hour=20, minute=30, second=0)
 
-    before_dawndusk_duration: Optional[int] = 0
+    before_dawndusk_duration: Optional[int] = None
 
-    after_dawndusk_duration: Optional[int] = 0
+    after_dawndusk_duration: Optional[int] = None
 
-    frequency_duration: Optional[int] = 0
+    frequency_duration: Optional[int] = None
 
-    frequency_interval: Optional[int] = 0
+    frequency_interval: Optional[int] = None
 
-    saving_threshold: float = 0.4
+    saving_threshold: Optional[float] = 0.4
 
 
 class AudioDirectories(BaseModel):
@@ -73,13 +75,13 @@ class AudioDirectories(BaseModel):
 class Summariser(BaseModel):
     """Summariser configuration."""
 
-    interval: float = 1.0  # interval in minutes
+    interval: Optional[float] = None  # interval in minutes
 
-    low_band_threshold: Optional[float] = 0.0
+    low_band_threshold: Optional[float] = None
 
-    mid_band_threshold: Optional[float] = 0.0
+    mid_band_threshold: Optional[float] = None
 
-    high_band_threshold: Optional[float] = 0.0
+    high_band_threshold: Optional[float] = None
 
 
 class MQTT_MessageConfig(BaseModel):
@@ -116,6 +118,8 @@ class HTTP_MessageConfig(BaseModel):
 
 class BatDetect2_ConfigSchema(BaseModel):
     """BatDetect2 Configuration Schematic."""
+
+    tmp_path: Annotated[Path, NoUserPrompt] = TEMP_PATH
 
     name: str = "batdetect2"
 

@@ -2,12 +2,11 @@
 
 import datetime
 from typing import Optional
-import pytz
 
+import pytz
 from acoupi import components, data, tasks
 from acoupi.programs.base import AcoupiProgram
 from acoupi.programs.workers import AcoupiWorker, WorkerConfig
-from celery.schedules import crontab
 
 from acoupi_batdetect2.configuration import BatDetect2_ConfigSchema
 from acoupi_batdetect2.model import BatDetect2
@@ -33,7 +32,7 @@ class BatDetect2_Program(AcoupiProgram):
     )
 
     def setup(self, config: BatDetect2_ConfigSchema):
-        """Setup.
+        """Set up the batdetect2 program.
 
         Section 1 - Define Tasks for the BatDetect2 Program
             1. Create Recording Task
@@ -49,7 +48,6 @@ class BatDetect2_Program(AcoupiProgram):
             4. Summarisers
             5. Messengers
         """
-
         self.validate_dirs(config)
         microphone = config.microphone_config
         self.recorder = components.PyAudioRecorder(
@@ -58,6 +56,7 @@ class BatDetect2_Program(AcoupiProgram):
             samplerate=microphone.samplerate,
             audio_channels=microphone.audio_channels,
             device_name=microphone.device_name,
+            audio_dir=config.tmp_path,
         )
 
         self.model = BatDetect2()
@@ -72,7 +71,6 @@ class BatDetect2_Program(AcoupiProgram):
         self.message_store = components.SqliteMessageStore(
             config.dbpath_messages
         )
-
 
         """ Section 1 - Define Tasks for the BatDetect2 Program """
         # Step 1 - Audio Recordings Task
@@ -100,6 +98,7 @@ class BatDetect2_Program(AcoupiProgram):
             logger=self.logger.getChild("file_management"),
             file_manager=self.file_manager,
             file_filters=self.create_file_filters(config),
+            temp_path=config.tmp_path,
         )
 
         summary_task = tasks.generate_summariser_task(
@@ -130,10 +129,16 @@ class BatDetect2_Program(AcoupiProgram):
             schedule=datetime.timedelta(seconds=30),
         )
 
-        self.add_task(
-            function=summary_task,
-            schedule=datetime.timedelta(minutes=config.summariser_config.interval),
-        )
+        if (
+            config.summariser_config is not None
+            and config.summariser_config.interval is not None
+        ):
+            self.add_task(
+                function=summary_task,
+                schedule=datetime.timedelta(
+                    minutes=config.summariser_config.interval
+                ),
+            )
 
         self.add_task(
             function=send_data_task,
@@ -145,7 +150,6 @@ class BatDetect2_Program(AcoupiProgram):
 
     def validate_dirs(self, config: BatDetect2_ConfigSchema):
         """Validate Stores Directories."""
-
         # Check that directories to store audio files exists.
         if not config.audio_directories.audio_dir.exists():
             config.audio_directories.audio_dir.mkdir(parents=True)
@@ -188,7 +192,6 @@ class BatDetect2_Program(AcoupiProgram):
 
     def create_detection_cleaners(self, config: BatDetect2_ConfigSchema):
         """Create Detection Cleaners."""
-
         detection_cleaners = []
 
         # Main detection_cleaner
@@ -231,8 +234,8 @@ class BatDetect2_Program(AcoupiProgram):
 
         # Additional saving_file filters
         if (
-            recording_saving.frequency_duration != 0
-            and recording_saving.frequency_interval != 0
+            recording_saving.frequency_duration is not None
+            and recording_saving.frequency_interval is not None
         ):
             # This filter will only save recordings at a frequency defined
             # by the duration (length of time in which files are saved) and
@@ -244,7 +247,7 @@ class BatDetect2_Program(AcoupiProgram):
                 )
             )
 
-        if recording_saving.before_dawndusk_duration != 0:
+        if recording_saving.before_dawndusk_duration is not None:
             # This filter will only save recordings if the recording time is
             # within the duration (lenght of time in minutes) before dawn and dusk.
             saving_filters.append(
@@ -254,7 +257,7 @@ class BatDetect2_Program(AcoupiProgram):
                 )
             )
 
-        if recording_saving.after_dawndusk_duration != 0:
+        if recording_saving.after_dawndusk_duration is not None:
             # This filter will only save recordings if the recording time is
             # within the duration (lenght of time in minutes) after dawn and dusk.
             saving_filters.append(
@@ -264,7 +267,7 @@ class BatDetect2_Program(AcoupiProgram):
                 )
             )
 
-        if recording_saving.saving_threshold != 0:
+        if recording_saving.saving_threshold is not None:
             # This filter will only save recordings if the recording files
             # have a positive detection above the threshold.
             saving_filters.append(
@@ -272,28 +275,24 @@ class BatDetect2_Program(AcoupiProgram):
                     threshold=recording_saving.saving_threshold,
                 )
             )
-        else:
-            raise UserWarning(
-                "No saving filters defined - no files will be saved."
-            )
+
+        print(saving_filters)
 
         return saving_filters
 
     def create_summariser(self, config: BatDetect2_ConfigSchema):
-        """ "Create Summariser."""
-
+        """Create Summariser."""
         # Main Summariser will send summary of detections at regular intervals.
         if not config.summariser_config:
             raise UserWarning(
                 "No saving filters defined - no files will be saved."
             )
-            return []
 
         summarisers = []
         summariser_config = config.summariser_config
 
         """Default Summariser: Return mean, max, min and count of detections of a time interval."""
-        if summariser_config.interval != 0.0:
+        if summariser_config.interval is not None:
             summarisers.append(
                 components.StatisticsDetectionsSummariser(
                     store=self.store,
@@ -304,9 +303,10 @@ class BatDetect2_Program(AcoupiProgram):
         """Threshold Summariser: Return count and mean of detections in threshold bands 
         for a specific time interval, if users set values for threshold bands."""
         if (
-            summariser_config.low_band_threshold != 0.0
-            and summariser_config.mid_band_threshold != 0.0
-            and summariser_config.high_band_threshold != 0.0
+            summariser_config.interval is not None
+            and summariser_config.low_band_threshold is not None
+            and summariser_config.mid_band_threshold is not None
+            and summariser_config.high_band_threshold is not None
         ):
             summarisers.append(
                 components.ThresholdsDetectionsSummariser(
@@ -322,13 +322,11 @@ class BatDetect2_Program(AcoupiProgram):
 
     def create_messenger(self, config: BatDetect2_ConfigSchema):
         """Create Messengers - Send Detection Results."""
-
         # Main Messenger will send messages to remote server.
         if not config.mqtt_message_config and not config.http_message_config:
             raise UserWarning(
                 "No messengers defined - no messages will be sent."
             )
-            return []
 
         messengers = []
 

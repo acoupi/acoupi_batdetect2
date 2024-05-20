@@ -17,8 +17,8 @@ readme = "README.md"
 license = {text = "Creative Commons Attribution-NonCommercial 4.0 International"}
 
 [build-system]
-requires = ["pdm-backend"]
-build-backend = "pdm.backend"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.pdm.dev-dependencies]
 dev = [
@@ -27,14 +27,37 @@ dev = [
     "pytest-celery>=0.0.0",
 ]
 
+[tool.rye]
+dev-dependencies = [
+    "acoupi @ file://../acoupi",
+    "pytest>=7.4.3",
+    "pytest-celery>=0.0.0",
+    "pyright>=1.1.363",
+    "ruff>=0.4.4",
+]
+
+[tool.ruff]
+line-length = 79
+target-version = "py39"
+
+[tool.ruff.format]
+docstring-code-format = true
+docstring-code-line-length = 60
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "B", "Q", "I", "D"]
+ignore = ["D1"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
+
+[tool.ruff.lint.isort]
+known-local-folder = ["src", "acoupi_batdetect2"]
+
+[tool.coverage.run]
+source = ["src/acoupi_batdetect2"]
+
 [tool.pyright]
 venvPath = "."
 venv = ".venv"
 pythonVersion = "3.9"
-
-[tool.black]
-line-length = 79
-
-[tool.isort]
-profile = "black"
-line_length = 79

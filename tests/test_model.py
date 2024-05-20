@@ -1,4 +1,5 @@
 """Test Suite for Acoupi BatDetect2 Model."""
+
 from acoupi import data
 
 from acoupi_batdetect2.model import BatDetect2

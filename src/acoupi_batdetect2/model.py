@@ -1,8 +1,8 @@
 """Acoupi detection and classification Models."""
-from batdetect2 import api
 
 from acoupi import data
 from acoupi.components import types
+from batdetect2 import api
 
 
 class BatDetect2(types.Model):
@@ -48,7 +48,7 @@ class BatDetect2(types.Model):
             )
             for detection in raw_detections
         ]
-    
+
         return data.ModelOutput(
             name_model="BatDetect2",
             recording=recording,
