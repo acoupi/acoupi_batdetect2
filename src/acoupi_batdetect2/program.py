@@ -293,7 +293,7 @@ class BatDetect2_Program(AcoupiProgram):
         summariser_config = config.summariser_config
 
         """Default Summariser: Return mean, max, min and count of detections of a time interval."""
-        if summariser_config.interval != 0:
+        if summariser_config.interval != 0.0:
             summarisers.append(
                 components.StatisticsDetectionsSummariser(
                     store=self.store,
@@ -304,9 +304,9 @@ class BatDetect2_Program(AcoupiProgram):
         """Threshold Summariser: Return count and mean of detections in threshold bands 
         for a specific time interval, if users set values for threshold bands."""
         if (
-            summariser_config.low_band_threshold != 0
-            and summariser_config.mid_band_threshold != 0
-            and summariser_config.high_band_threshold != 0
+            summariser_config.low_band_threshold != 0.0
+            and summariser_config.mid_band_threshold != 0.0
+            and summariser_config.high_band_threshold != 0.0
         ):
             summarisers.append(
                 components.ThresholdsDetectionsSummariser(
