@@ -1,46 +1,49 @@
 """Batdetect2 Program Configuration Options."""
+
 import datetime
 from pathlib import Path
-from typing import Optional
+from typing import Annotated, Optional
 
+from acoupi.components.audio_recorder import MicrophoneConfig
+from acoupi.files import TEMP_PATH
+from acoupi.programs import NoUserPrompt
 from pydantic import BaseModel, Field
 
 """Default paramaters for Batdetect2 Program"""
 
 
-class MicrophoneConfig(BaseModel):
-    """Microphone configuration parameters."""
-
-    samplerate: int = 250_000
-
-    audio_channels: int = 1
-
-    device_index: int = 1
-
-
 class AudioConfig(BaseModel):
-    """Audio and microphone configuration parameters."""
-
-    microphone_config: MicrophoneConfig = Field(
-        default_factory=MicrophoneConfig,
-    )
+    """Audio recording configuration parameters."""
 
     audio_duration: int = 3
+    """Duration of each audio recording in seconds."""
+
+    recording_interval: int = 5
+    """Interval between each audio recording in seconds."""
 
     chunksize: int = 8192
+    """Chunksize of audio recording."""
 
-    recording_interval: int = 10
+    # @model_validator(mode="after")
+    # def validate_audio_duration(cls, value):
+    #     """Validate audio duration."""
+    #
+    #     if value.audio_duration > value.recording_interval:
+    #         raise ValueError(
+    #             "Audio duration cannot be greater than recording interval."
+    #         )
+    #
+    #     return value
 
 
 class RecordingSchedule(BaseModel):
     """Recording schedule config."""
 
-    start_recording: datetime.time = datetime.time(hour=10, minute=0, second=0)
+    start_recording: datetime.time = datetime.time(hour=5, minute=30, second=0)
 
     end_recording: datetime.time = datetime.time(hour=20, minute=0, second=0)
 
 
-# class RecordingSaving(BaseModel):
 class SaveRecordingFilter(BaseModel):
     """Recording saving options configuration."""
 
@@ -48,15 +51,15 @@ class SaveRecordingFilter(BaseModel):
 
     endtime: datetime.time = datetime.time(hour=20, minute=30, second=0)
 
-    before_dawndusk_duration: int = 0
+    before_dawndusk_duration: Optional[int] = None
 
-    after_dawndusk_duration: int = 0
+    after_dawndusk_duration: Optional[int] = None
 
     frequency_duration: Optional[int] = None
 
     frequency_interval: Optional[int] = None
 
-    saving_threshold: float = 0.8
+    saving_threshold: Optional[float] = 0.4
 
 
 class AudioDirectories(BaseModel):
@@ -69,16 +72,28 @@ class AudioDirectories(BaseModel):
     audio_dir_false: Path = Path.home() / "storages" / "recordings" / "no_bats"
 
 
+class Summariser(BaseModel):
+    """Summariser configuration."""
+
+    interval: Optional[float] = None  # interval in minutes
+
+    low_band_threshold: Optional[float] = None
+
+    mid_band_threshold: Optional[float] = None
+
+    high_band_threshold: Optional[float] = None
+
+
 class MQTT_MessageConfig(BaseModel):
     """MQTT configuration to send messages."""
 
-    host: str = "localhost"
+    host: str = "default_host"
 
     port: int = 1884
 
-    client_password: str = "guest"
+    client_username: str = "guest_username"
 
-    client_username: str = "guest"
+    client_password: str = "guest_password"
 
     topic: str = "mqtt-topic"
 
@@ -92,17 +107,19 @@ class HTTP_MessageConfig(BaseModel):
 
     baseurl: str = "base-url"
 
-    client_password: str = "guest"
+    client_password: str = "guest_password"
 
-    client_id: str = "guest"
+    client_id: str = "guest_clientid"
 
-    api_key: str = "guest"
+    api_key: str = "guest_apikey"
 
     content_type: str = "application-json"
 
 
 class BatDetect2_ConfigSchema(BaseModel):
     """BatDetect2 Configuration Schematic."""
+
+    tmp_path: Annotated[Path, NoUserPrompt] = TEMP_PATH
 
     name: str = "batdetect2"
 
@@ -116,9 +133,7 @@ class BatDetect2_ConfigSchema(BaseModel):
 
     timezone: str = "Europe/London"
 
-    microphone: MicrophoneConfig = Field(
-        default_factory=MicrophoneConfig,
-    )
+    microphone_config: MicrophoneConfig
 
     audio_config: AudioConfig = Field(
         default_factory=AudioConfig,
@@ -134,6 +149,10 @@ class BatDetect2_ConfigSchema(BaseModel):
 
     audio_directories: AudioDirectories = Field(
         default_factory=AudioDirectories,
+    )
+
+    summariser_config: Optional[Summariser] = Field(
+        default_factory=Summariser,
     )
 
     mqtt_message_config: Optional[MQTT_MessageConfig] = Field(

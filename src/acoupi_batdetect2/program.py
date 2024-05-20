@@ -1,4 +1,5 @@
 """Batdetect2 Program."""
+
 import datetime
 from typing import Optional
 
@@ -6,7 +7,6 @@ import pytz
 from acoupi import components, data, tasks
 from acoupi.programs.base import AcoupiProgram
 from acoupi.programs.workers import AcoupiWorker, WorkerConfig
-from celery.schedules import crontab
 
 from acoupi_batdetect2.configuration import BatDetect2_ConfigSchema
 from acoupi_batdetect2.model import BatDetect2
@@ -20,90 +20,65 @@ class BatDetect2_Program(AcoupiProgram):
     worker_config: Optional[WorkerConfig] = WorkerConfig(
         workers=[
             AcoupiWorker(
-                name="recording_worker",
+                name="recording",
                 queues=["recording"],
                 concurrency=1,
             ),
-            # AcoupiWorker(
-            #    name="detection_worker",
-            #    queues=["detection"],
-            #    concurrency=1,
-            # ),
             AcoupiWorker(
-                name="default_worker",
-                queues=["default"],
+                name="default",
+                queues=["celery"],
             ),
         ],
     )
 
     def setup(self, config: BatDetect2_ConfigSchema):
-        """Setup.
+        """Set up the batdetect2 program.
 
-        1. Create Audio Recording Task
-        2. Create Detection Task
-        3. Create Saving Recording Filter and Management Task
-        4. Create Message Task
+        Section 1 - Define Tasks for the BatDetect2 Program
+            1. Create Recording Task
+            2. Create Detection Task
+            3. Create File Management Task
+            4. Create Summary Task
+            5. Create Message Task
+        Section 2 - Add Tasks to BatDetect2 Program
+        Section 3 - Configure Tasks based on BatDetect2 Configurations & User Inputs
+            1. Store Directories
+            2. Recording Conditions
+            3. File Filters
+            4. Summarisers
+            5. Messengers
         """
-        timezone = pytz.timezone(config.timezone)
+        self.validate_dirs(config)
+        microphone = config.microphone_config
+        self.recorder = components.PyAudioRecorder(
+            duration=config.audio_config.audio_duration,
+            chunksize=config.audio_config.chunksize,
+            samplerate=microphone.samplerate,
+            audio_channels=microphone.audio_channels,
+            device_name=microphone.device_name,
+            audio_dir=config.tmp_path,
+        )
 
-        if not config.dbpath.parent.exists():
-            config.dbpath.parent.touch()
-
-        if not config.dbpath.exists():
-            config.dbpath.touch()
-
-        if not config.dbpath_messages.exists():
-            config.dbpath_messages.touch()
-
-        if not config.audio_directories.audio_dir_true.parent.exists():
-            config.audio_directories.audio_dir_true.parent.mkdir(parents=True)
-
-        if not config.audio_directories.audio_dir_true.exists():
-            config.audio_directories.audio_dir_true.mkdir(parents=True)
-
-        if not config.audio_directories.audio_dir_false.parent.exists():
-            config.audio_directories.audio_dir_false.parent.mkdir(parents=True)
-
-        if not config.audio_directories.audio_dir_false.exists():
-            config.audio_directories.audio_dir_false.mkdir(parents=True)
-
+        self.model = BatDetect2()
+        self.file_manager = components.SaveRecordingManager(
+            dirpath=config.audio_directories.audio_dir,
+            dirpath_true=config.audio_directories.audio_dir_true,
+            dirpath_false=config.audio_directories.audio_dir_false,
+            timeformat=config.timeformat,
+            threshold=config.detection_threshold,
+        )
         self.store = components.SqliteStore(config.dbpath)
         self.message_store = components.SqliteMessageStore(
             config.dbpath_messages
         )
-        self.recorder = components.PyAudioRecorder(
-            duration=config.audio_config.audio_duration,
-            samplerate=config.microphone.samplerate,
-            audio_channels=config.microphone.audio_channels,
-            chunksize=config.audio_config.chunksize,
-            device_index=config.microphone.device_index,
-        )
-        self.model = BatDetect2()
 
+        """ Section 1 - Define Tasks for the BatDetect2 Program """
         # Step 1 - Audio Recordings Task
         recording_task = tasks.generate_recording_task(
             recorder=self.recorder,
             store=self.store,
             logger=self.logger.getChild("recording"),
-            recording_conditions=[
-                components.IsInIntervals(
-                    intervals=[
-                        data.TimeInterval(
-                            start=config.recording_schedule.start_recording,
-                            end=datetime.datetime.strptime(
-                                "23:59:59", "%H:%M:%S"
-                            ).time(),
-                        ),
-                        data.TimeInterval(
-                            start=datetime.datetime.strptime(
-                                "00:00:00", "%H:%M:%S"
-                            ).time(),
-                            end=config.recording_schedule.end_recording,
-                        ),
-                    ],
-                    timezone=timezone,
-                )
-            ],
+            recording_conditions=self.create_recording_conditions(config),
         )
 
         # Step 2 - Model Detections Task
@@ -112,91 +87,271 @@ class BatDetect2_Program(AcoupiProgram):
             model=self.model,
             message_store=self.message_store,
             logger=self.logger.getChild("detection"),
-            output_cleaners=[
-                components.ThresholdDetectionFilter(
-                    threshold=config.detection_threshold
-                )
-            ],
+            output_cleaners=self.create_detection_cleaners(config),
             message_factories=[components.FullModelOutputMessageBuilder()],
+            # message_factories=[],
         )
 
         # Step 3 - Files Management Task
-        def create_file_filters():
-            recording_saving = config.recording_saving
-
-            if recording_saving is None:
-                return []
-
-            saving_filters = []
-            if (
-                recording_saving.starttime is not None
-                and recording_saving.endtime is not None
-            ):
-                saving_filters.append(
-                    components.SaveIfInInterval(
-                        interval=data.TimeInterval(
-                            start=recording_saving.starttime,
-                            end=recording_saving.endtime,
-                        ),
-                        timezone=timezone,
-                    )
-                )
-
-            elif (
-                recording_saving.frequency_duration is not None
-                and recording_saving.frequency_interval is not None
-            ):
-                saving_filters.append(
-                    components.FrequencySchedule(
-                        duration=recording_saving.frequency_duration,
-                        frequency=recording_saving.frequency_interval,
-                    )
-                )
-
-            elif recording_saving.before_dawndusk_duration is not None:
-                saving_filters.append(
-                    components.Before_DawnDuskTimeInterval(
-                        duration=recording_saving.before_dawndusk_duration,
-                        timezone=timezone,
-                    )
-                )
-
-            elif recording_saving.after_dawndusk_duration is not None:
-                saving_filters.append(
-                    components.After_DawnDuskTimeInterval(
-                        duration=recording_saving.after_dawndusk_duration,
-                        timezone=timezone,
-                    )
-                )
-            elif recording_saving.saving_threshold is not None:
-                saving_filters.append(
-                    components.ThresholdRecordingFilter(
-                        threshold=recording_saving.saving_threshold,
-                    )
-                )
-            else:
-                raise UserWarning(
-                    "No saving filters defined - no files will be saved."
-                )
-
-            return saving_filters
-
         file_management_task = tasks.generate_file_management_task(
             store=self.store,
-            file_manager=components.SaveRecordingManager(
-                dirpath=config.audio_directories.audio_dir,
-                dirpath_true=config.audio_directories.audio_dir_true,
-                dirpath_false=config.audio_directories.audio_dir_false,
-                timeformat=config.timeformat,
-                threshold=config.detection_threshold,
-            ),
-            file_filters=create_file_filters(),
+            logger=self.logger.getChild("file_management"),
+            file_manager=self.file_manager,
+            file_filters=self.create_file_filters(config),
+            temp_path=config.tmp_path,
+        )
+
+        summary_task = tasks.generate_summariser_task(
+            summarisers=self.create_summariser(config),
+            message_store=self.message_store,
+            logger=self.logger.getChild("summary"),
         )
 
         # Step 4 - Send Data Task
-        def create_messenger():
-            if config.http_message_config is not None:
-                return components.HTTPMessenger(
+        send_data_task = tasks.generate_send_data_task(
+            message_store=self.message_store,
+            messengers=self.create_messenger(config),
+            logger=self.logger.getChild("messaging"),
+        )
+
+        """ Section 2 - Add Tasks to BatDetect2 Program """
+        self.add_task(
+            function=recording_task,
+            schedule=datetime.timedelta(
+                seconds=config.audio_config.recording_interval
+            ),
+            callbacks=[detection_task],
+            queue="recording",
+        )
+
+        self.add_task(
+            function=file_management_task,
+            schedule=datetime.timedelta(seconds=30),
+        )
+
+        if (
+            config.summariser_config is not None
+            and config.summariser_config.interval is not None
+        ):
+            self.add_task(
+                function=summary_task,
+                schedule=datetime.timedelta(
+                    minutes=config.summariser_config.interval
+                ),
+            )
+
+        self.add_task(
+            function=send_data_task,
+            # schedule=crontab(minute="*/1"),
+            schedule=datetime.timedelta(seconds=10),
+        )
+
+    """ Section 3 - Configure Tasks based on BatDetect2 Configurations & User Inputs """
+
+    def validate_dirs(self, config: BatDetect2_ConfigSchema):
+        """Validate Stores Directories."""
+        # Check that directories to store audio files exists.
+        if not config.audio_directories.audio_dir.exists():
+            config.audio_directories.audio_dir.mkdir(parents=True)
+        # Check directory to store audio files with positive detections.
+        if not config.audio_directories.audio_dir_true.exists():
+            config.audio_directories.audio_dir_true.mkdir(parents=True)
+        # Check directory to store audio files with negative detections.
+        if not config.audio_directories.audio_dir_false.exists():
+            config.audio_directories.audio_dir_false.mkdir(parents=True)
+        # Check directory to store database.
+        if not config.dbpath.parent.exists():
+            config.dbpath.parent.mkdir(parents=True)
+        if not config.dbpath.exists():
+            config.dbpath.touch()
+        if not config.dbpath_messages.exists():
+            config.dbpath_messages.touch()
+
+    def create_recording_conditions(self, config: BatDetect2_ConfigSchema):
+        """Create Recording Conditions."""
+        timezone = pytz.timezone(config.timezone)
+        return [
+            components.IsInIntervals(
+                intervals=[
+                    data.TimeInterval(
+                        start=config.recording_schedule.start_recording,
+                        end=datetime.datetime.strptime(
+                            "23:59:59", "%H:%M:%S"
+                        ).time(),
+                    ),
+                    data.TimeInterval(
+                        start=datetime.datetime.strptime(
+                            "00:00:00", "%H:%M:%S"
+                        ).time(),
+                        end=config.recording_schedule.end_recording,
+                    ),
+                ],
+                timezone=timezone,
+            )
+        ]
+
+    def create_detection_cleaners(self, config: BatDetect2_ConfigSchema):
+        """Create Detection Cleaners."""
+        detection_cleaners = []
+
+        # Main detection_cleaner
+        # Will clean the model outputs by removing any detections that are
+        # below the threshold.
+        detection_cleaners.append(
+            components.ThresholdDetectionFilter(
+                threshold=config.detection_threshold,
+            ),
+        )
+
+        return detection_cleaners
+
+    def create_file_filters(self, config: BatDetect2_ConfigSchema):
+        """Create File Filters."""
+        if not config.recording_saving:
+            # No saving filters defined
+            return []
+
+        saving_filters = []
+        timezone = pytz.timezone(config.timezone)
+        recording_saving = config.recording_saving
+
+        # Main saving_file filter
+        # Will only save recordings if the recording time is in the
+        # interval defined by the start and end time.
+        if (
+            recording_saving.starttime is not None
+            and recording_saving.endtime is not None
+        ):
+            saving_filters.append(
+                components.SaveIfInInterval(
+                    interval=data.TimeInterval(
+                        start=recording_saving.starttime,
+                        end=recording_saving.endtime,
+                    ),
+                    timezone=timezone,
+                )
+            )
+
+        # Additional saving_file filters
+        if (
+            recording_saving.frequency_duration is not None
+            and recording_saving.frequency_interval is not None
+        ):
+            # This filter will only save recordings at a frequency defined
+            # by the duration (length of time in which files are saved) and
+            # interval (period of time between each duration in which files are not saved).
+            saving_filters.append(
+                components.FrequencySchedule(
+                    duration=recording_saving.frequency_duration,
+                    frequency=recording_saving.frequency_interval,
+                )
+            )
+
+        if recording_saving.before_dawndusk_duration is not None:
+            # This filter will only save recordings if the recording time is
+            # within the duration (lenght of time in minutes) before dawn and dusk.
+            saving_filters.append(
+                components.Before_DawnDuskTimeInterval(
+                    duration=recording_saving.before_dawndusk_duration,
+                    timezone=timezone,
+                )
+            )
+
+        if recording_saving.after_dawndusk_duration is not None:
+            # This filter will only save recordings if the recording time is
+            # within the duration (lenght of time in minutes) after dawn and dusk.
+            saving_filters.append(
+                components.After_DawnDuskTimeInterval(
+                    duration=recording_saving.after_dawndusk_duration,
+                    timezone=timezone,
+                )
+            )
+
+        if recording_saving.saving_threshold is not None:
+            # This filter will only save recordings if the recording files
+            # have a positive detection above the threshold.
+            saving_filters.append(
+                components.ThresholdRecordingFilter(
+                    threshold=recording_saving.saving_threshold,
+                )
+            )
+
+        print(saving_filters)
+
+        return saving_filters
+
+    def create_summariser(self, config: BatDetect2_ConfigSchema):
+        """Create Summariser."""
+        # Main Summariser will send summary of detections at regular intervals.
+        if not config.summariser_config:
+            raise UserWarning(
+                "No saving filters defined - no files will be saved."
+            )
+
+        summarisers = []
+        summariser_config = config.summariser_config
+
+        """Default Summariser: Return mean, max, min and count of detections of a time interval."""
+        if summariser_config.interval is not None:
+            summarisers.append(
+                components.StatisticsDetectionsSummariser(
+                    store=self.store,
+                    interval=summariser_config.interval,
+                )
+            )
+
+        """Threshold Summariser: Return count and mean of detections in threshold bands 
+        for a specific time interval, if users set values for threshold bands."""
+        if (
+            summariser_config.interval is not None
+            and summariser_config.low_band_threshold is not None
+            and summariser_config.mid_band_threshold is not None
+            and summariser_config.high_band_threshold is not None
+        ):
+            summarisers.append(
+                components.ThresholdsDetectionsSummariser(
+                    store=self.store,
+                    interval=summariser_config.interval,
+                    low_band_threshold=summariser_config.low_band_threshold,
+                    mid_band_threshold=summariser_config.mid_band_threshold,
+                    high_band_threshold=summariser_config.high_band_threshold,
+                )
+            )
+
+        return summarisers
+
+    def create_messenger(self, config: BatDetect2_ConfigSchema):
+        """Create Messengers - Send Detection Results."""
+        # Main Messenger will send messages to remote server.
+        if not config.mqtt_message_config and not config.http_message_config:
+            raise UserWarning(
+                "No messengers defined - no messages will be sent."
+            )
+
+        messengers = []
+
+        """MQTT Messenger - Will send messages to a MQTT broker."""
+        if (
+            config.mqtt_message_config is not None
+            and config.mqtt_message_config.client_password != "guest_password"
+        ):
+            messengers.append(
+                components.MQTTMessenger(
+                    host=config.mqtt_message_config.host,
+                    port=config.mqtt_message_config.port,
+                    password=config.mqtt_message_config.client_password,
+                    username=config.mqtt_message_config.client_username,
+                    topic=config.mqtt_message_config.topic,
+                    clientid=config.mqtt_message_config.clientid,
+                )
+            )
+
+        if (
+            config.http_message_config is not None
+            and config.http_message_config.client_password != "guest_password"
+        ):
+            messengers.append(
+                components.HTTPMessenger(
                     base_url=config.http_message_config.baseurl,
                     base_params={
                         "client-id": config.http_message_config.client_id,
@@ -207,50 +362,6 @@ class BatDetect2_Program(AcoupiProgram):
                         "Authorization": config.http_message_config.api_key,
                     },
                 )
-
-            if config.mqtt_message_config is not None:
-                return components.MQTTMessenger(
-                    host=config.mqtt_message_config.host,
-                    port=config.mqtt_message_config.port,
-                    password=config.mqtt_message_config.client_password,
-                    username=config.mqtt_message_config.client_username,
-                    topic=config.mqtt_message_config.topic,
-                    clientid=config.mqtt_message_config.clientid,
-                )
-
-            raise UserWarning(
-                "No Messenger defined - no data will be communicated."
             )
 
-        self.messenger = create_messenger()
-
-        send_data_task = tasks.generate_send_data_task(
-            message_store=self.message_store,
-            messenger=self.messenger,
-        )
-
-        # Final Step - Add Tasks to Program
-        self.add_task(
-            function=recording_task,
-            callbacks=[detection_task],
-            schedule=datetime.timedelta(seconds=10),
-            queue="recording",
-        )
-
-        # self.add_task(
-        #    function=detection_task,
-        #    schedule=datetime.timedelta(seconds=5),
-        #    queue="detection",
-        # )
-
-        self.add_task(
-            function=file_management_task,
-            schedule=datetime.timedelta(seconds=30),
-            queue="default",
-        )
-
-        self.add_task(
-            function=send_data_task,
-            schedule=crontab(minute="*/1"),
-            queue="default",
-        )
+        return messengers
