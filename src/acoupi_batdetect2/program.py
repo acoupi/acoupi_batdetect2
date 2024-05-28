@@ -131,7 +131,7 @@ class BatDetect2_Program(AcoupiProgram):
 
         if (
             config.summariser_config is not None
-            and config.summariser_config.interval is not None
+            and config.summariser_config.interval != 0.0
         ):
             self.add_task(
                 function=summary_task,
@@ -142,7 +142,6 @@ class BatDetect2_Program(AcoupiProgram):
 
         self.add_task(
             function=send_data_task,
-            # schedule=crontab(minute="*/1"),
             schedule=datetime.timedelta(seconds=10),
         )
 
@@ -234,8 +233,8 @@ class BatDetect2_Program(AcoupiProgram):
 
         # Additional saving_file filters
         if (
-            recording_saving.frequency_duration is not None
-            and recording_saving.frequency_interval is not None
+            recording_saving.frequency_duration != 0
+            and recording_saving.frequency_interval != 0
         ):
             # This filter will only save recordings at a frequency defined
             # by the duration (length of time in which files are saved) and
@@ -247,7 +246,7 @@ class BatDetect2_Program(AcoupiProgram):
                 )
             )
 
-        if recording_saving.before_dawndusk_duration is not None:
+        if recording_saving.before_dawndusk_duration != 0:
             # This filter will only save recordings if the recording time is
             # within the duration (lenght of time in minutes) before dawn and dusk.
             saving_filters.append(
@@ -257,7 +256,7 @@ class BatDetect2_Program(AcoupiProgram):
                 )
             )
 
-        if recording_saving.after_dawndusk_duration is not None:
+        if recording_saving.after_dawndusk_duration != 0:
             # This filter will only save recordings if the recording time is
             # within the duration (lenght of time in minutes) after dawn and dusk.
             saving_filters.append(
@@ -267,7 +266,7 @@ class BatDetect2_Program(AcoupiProgram):
                 )
             )
 
-        if recording_saving.saving_threshold is not None:
+        if recording_saving.saving_threshold != 0.0:
             # This filter will only save recordings if the recording files
             # have a positive detection above the threshold.
             saving_filters.append(
@@ -275,8 +274,6 @@ class BatDetect2_Program(AcoupiProgram):
                     threshold=recording_saving.saving_threshold,
                 )
             )
-
-        print(saving_filters)
 
         return saving_filters
 
@@ -292,7 +289,7 @@ class BatDetect2_Program(AcoupiProgram):
         summariser_config = config.summariser_config
 
         """Default Summariser: Return mean, max, min and count of detections of a time interval."""
-        if summariser_config.interval is not None:
+        if summariser_config.interval != 0.0:
             summarisers.append(
                 components.StatisticsDetectionsSummariser(
                     store=self.store,
@@ -303,10 +300,10 @@ class BatDetect2_Program(AcoupiProgram):
         """Threshold Summariser: Return count and mean of detections in threshold bands 
         for a specific time interval, if users set values for threshold bands."""
         if (
-            summariser_config.interval is not None
-            and summariser_config.low_band_threshold is not None
-            and summariser_config.mid_band_threshold is not None
-            and summariser_config.high_band_threshold is not None
+            summariser_config.interval != 0.0
+            and summariser_config.low_band_threshold != 0.0
+            and summariser_config.mid_band_threshold != 0.0
+            and summariser_config.high_band_threshold != 0.0
         ):
             summarisers.append(
                 components.ThresholdsDetectionsSummariser(

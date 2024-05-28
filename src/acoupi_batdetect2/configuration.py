@@ -51,15 +51,15 @@ class SaveRecordingFilter(BaseModel):
 
     endtime: datetime.time = datetime.time(hour=20, minute=30, second=0)
 
-    before_dawndusk_duration: Optional[int] = None
+    before_dawndusk_duration: Optional[int] = 0
 
-    after_dawndusk_duration: Optional[int] = None
+    after_dawndusk_duration: Optional[int] = 0
 
-    frequency_duration: Optional[int] = None
+    frequency_duration: Optional[int] = 0
 
-    frequency_interval: Optional[int] = None
+    frequency_interval: Optional[int] = 0
 
-    saving_threshold: Optional[float] = 0.4
+    saving_threshold: Optional[float] = 0.2
 
 
 class AudioDirectories(BaseModel):
@@ -75,13 +75,13 @@ class AudioDirectories(BaseModel):
 class Summariser(BaseModel):
     """Summariser configuration."""
 
-    interval: Optional[float] = None  # interval in minutes
+    interval: Optional[float] = 0.5  # interval in minutes
 
-    low_band_threshold: Optional[float] = None
+    low_band_threshold: Optional[float] = 0.0
 
-    mid_band_threshold: Optional[float] = None
+    mid_band_threshold: Optional[float] = 0.0
 
-    high_band_threshold: Optional[float] = None
+    high_band_threshold: Optional[float] = 0.0
 
 
 class MQTT_MessageConfig(BaseModel):
