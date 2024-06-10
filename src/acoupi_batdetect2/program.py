@@ -99,6 +99,7 @@ class BatDetect2_Program(AcoupiProgram):
             file_manager=self.file_manager,
             file_filters=self.create_file_filters(config),
             temp_path=config.tmp_path,
+            required_models=["batdetect2"]
         )
 
         summary_task = tasks.generate_summariser_task(
