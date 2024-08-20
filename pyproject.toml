@@ -10,6 +10,7 @@ authors = [
 dependencies = [
     "batdetect2>=1.0.7",
     "pydantic-settings>=2.1.0",
+    "pygments>=2.18.0",
 ]
 
 requires-python = ">=3.9,<3.11"
@@ -22,7 +23,7 @@ build-backend = "hatchling.build"
 
 [tool.pdm.dev-dependencies]
 dev = [
-    "acoupi @ file:///Users/audevuilliomenet/Documents/venv_acoupi/acoupi",
+    "acoupi @ file:///home/pi/acoupi",
     "pytest>=7.4.3",
     "pytest-celery>=0.0.0",
 ]
