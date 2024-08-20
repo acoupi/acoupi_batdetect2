@@ -136,10 +136,6 @@ class BatDetect2_ConfigSchema(BaseModel):
         default_factory=SaveRecordingFilter,
     )
 
-    recording_saving: Optional[SaveRecordingManager] = Field(
-        default_factory=SaveRecordingManager,
-    )
-
     audio_directories: AudioDirectories = Field(
         default_factory=AudioDirectories,
     )
