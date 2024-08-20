@@ -24,17 +24,6 @@ class AudioConfig(BaseModel):
     chunksize: int = 8192
     """Chunksize of audio recording."""
 
-    # @model_validator(mode="after")
-    # def validate_audio_duration(cls, value):
-    #     """Validate audio duration."""
-    #
-    #     if value.audio_duration > value.recording_interval:
-    #         raise ValueError(
-    #             "Audio duration cannot be greater than recording interval."
-    #         )
-    #
-    #     return value
-
 
 class RecordingSchedule(BaseModel):
     """Recording schedule config."""
@@ -51,6 +40,8 @@ class SaveRecordingFilter(BaseModel):
 
     endtime: datetime.time = datetime.time(hour=20, minute=30, second=0)
 
+    saving_threshold: Optional[float] = 0.2
+
     before_dawndusk_duration: Optional[int] = 0
 
     after_dawndusk_duration: Optional[int] = 0
@@ -58,8 +49,6 @@ class SaveRecordingFilter(BaseModel):
     frequency_duration: Optional[int] = 0
 
     frequency_interval: Optional[int] = 0
-
-    saving_threshold: Optional[float] = 0.2
 
 
 class AudioDirectories(BaseModel):
@@ -143,8 +132,12 @@ class BatDetect2_ConfigSchema(BaseModel):
         default_factory=RecordingSchedule,
     )
 
-    recording_saving: Optional[SaveRecordingFilter] = Field(
+    saving_filters: Optional[SaveRecordingFilter] = Field(
         default_factory=SaveRecordingFilter,
+    )
+
+    recording_saving: Optional[SaveRecordingManager] = Field(
+        default_factory=SaveRecordingManager,
     )
 
     audio_directories: AudioDirectories = Field(
