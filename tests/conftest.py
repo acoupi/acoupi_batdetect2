@@ -7,7 +7,7 @@ import pyaudio
 import pytest
 from acoupi import components, data
 from acoupi.devices.audio import get_input_devices
-from acoupi.system.configs import CeleryConfig
+from acoupi.system.constants import CeleryConfig
 from celery import Celery
 from celery.worker import WorkController
 
