@@ -6,7 +6,7 @@ from typing import Annotated, Optional
 
 from acoupi.components.audio_recorder import MicrophoneConfig
 from acoupi.files import TEMP_PATH
-from acoupi.programs import NoUserPrompt
+from acoupi.programs.custom import NoUserPrompt
 from pydantic import BaseModel, Field
 
 """Default paramaters for Batdetect2 Program"""
