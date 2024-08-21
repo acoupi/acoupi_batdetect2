@@ -198,7 +198,7 @@ class BatDetect2_Program(AcoupiProgram):
         # below the threshold.
         detection_cleaners.append(
             components.ThresholdDetectionFilter(
-                threshold=config.detection_threshold,
+                detection_threshold=config.detection_threshold,
             ),
         )
 
