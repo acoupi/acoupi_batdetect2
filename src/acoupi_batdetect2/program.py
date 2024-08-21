@@ -95,19 +95,19 @@ class BatDetect2_Program(AcoupiProgram):
         # Step 3 - Files Management Task
         file_management_task = tasks.generate_file_management_task(
             store=self.store,
+            file_manager=self.saving_manager,
             logger=self.logger.getChild("file_management"),
             file_filters=self.create_file_filters(config),
-            file_saving_manager=self.saving_manager,
             temp_path=config.tmp_path,
         )
-
+        # Step 4 - Summariser Task
         summary_task = tasks.generate_summariser_task(
             summarisers=self.create_summariser(config),
             message_store=self.message_store,
             logger=self.logger.getChild("summary"),
         )
-    
-        # Step 4 - Send Data Task
+
+        # Step 5 - Send Data Task
         send_data_task = tasks.generate_send_data_task(
             message_store=self.message_store,
             messengers=self.create_messenger(config),
@@ -126,7 +126,7 @@ class BatDetect2_Program(AcoupiProgram):
 
         self.add_task(
             function=file_management_task,
-            schedule=datetime.timedelta(seconds=30),
+            schedule=datetime.timedelta(seconds=20),
         )
 
         if (
@@ -198,7 +198,7 @@ class BatDetect2_Program(AcoupiProgram):
         # below the threshold.
         detection_cleaners.append(
             components.ThresholdDetectionFilter(
-                detection_threshold=config.detection_threshold,
+                threshold=config.detection_threshold,
             ),
         )
 
@@ -270,8 +270,7 @@ class BatDetect2_Program(AcoupiProgram):
             # This filter will only save recordings if the recording files
             # have a positive detection above the threshold.
             file_filters.append(
-                components.ThresholdDetectionSavingRecordingFilter(
-                    detection_threshold=config.detection_threshold,
+                components.SavingThreshold(
                     saving_threshold=saving_filters.saving_threshold,
                 )
             )
