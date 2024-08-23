@@ -88,8 +88,8 @@ class BatDetect2_Program(AcoupiProgram):
             model=self.model,
             message_store=self.message_store,
             logger=self.logger.getChild("detection"),
-            output_cleaners=self.create_detection_cleaners(config),
-            message_factories=[components.FullModelOutputMessageBuilder()],
+            output_cleaners=self.create_modeloutput_cleaners(config),
+            message_factories=[components.DetectionThresholdMessageBuilder(detection_threshold=config.detection_threshold)],
         )
 
         # Step 3 - Files Management Task
@@ -189,19 +189,10 @@ class BatDetect2_Program(AcoupiProgram):
             )
         ]
 
-    def create_detection_cleaners(self, config: BatDetect2_ConfigSchema):
+    def create_modeloutput_cleaners(self, config: BatDetect2_ConfigSchema):
         """Create Detection Cleaners."""
         detection_cleaners = []
-
-        # Main detection_cleaner
-        # Will clean the model outputs by removing any detections that are
-        # below the threshold.
-        detection_cleaners.append(
-            components.ThresholdDetectionFilter(
-                detection_threshold=config.detection_threshold,
-            ),
-        )
-
+        # No OutputCleaner Defined.
         return detection_cleaners
 
     def create_file_filters(self, config: BatDetect2_ConfigSchema):
