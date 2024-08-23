@@ -95,7 +95,7 @@ class BatDetect2_Program(AcoupiProgram):
         # Step 3 - Files Management Task
         file_management_task = tasks.generate_file_management_task(
             store=self.store,
-            file_manager=self.saving_manager,
+            file_managers=[self.saving_manager],
             logger=self.logger.getChild("file_management"),
             file_filters=self.create_file_filters(config),
             temp_path=config.tmp_path,
@@ -126,7 +126,7 @@ class BatDetect2_Program(AcoupiProgram):
 
         self.add_task(
             function=file_management_task,
-            schedule=datetime.timedelta(seconds=20),
+            schedule=datetime.timedelta(seconds=30),
         )
 
         if (

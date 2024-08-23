@@ -6,7 +6,7 @@ from typing import Annotated, Optional
 
 from acoupi.components.audio_recorder import MicrophoneConfig
 from acoupi.files import TEMP_PATH
-from acoupi.programs.custom import NoUserPrompt
+from acoupi.programs.custom.base import NoUserPrompt
 from pydantic import BaseModel, Field
 
 """Default paramaters for Batdetect2 Program"""
@@ -28,17 +28,17 @@ class AudioConfig(BaseModel):
 class RecordingSchedule(BaseModel):
     """Recording schedule config."""
 
-    start_recording: datetime.time = datetime.time(hour=5, minute=30, second=0)
+    start_recording: datetime.time = datetime.time(hour=10, minute=0, second=0)
 
-    end_recording: datetime.time = datetime.time(hour=20, minute=0, second=0)
+    end_recording: datetime.time = datetime.time(hour=5, minute=0, second=0)
 
 
 class SaveRecordingFilter(BaseModel):
     """Recording saving options configuration."""
 
-    starttime: datetime.time = datetime.time(hour=9, minute=30, second=0)
+    starttime: datetime.time = datetime.time(hour=10, minute=0, second=0)
 
-    endtime: datetime.time = datetime.time(hour=20, minute=30, second=0)
+    endtime: datetime.time = datetime.time(hour=5, minute=0, second=0)
 
     saving_threshold: Optional[float] = 0.2
 
@@ -112,7 +112,7 @@ class BatDetect2_ConfigSchema(BaseModel):
 
     name: str = "batdetect2"
 
-    detection_threshold: float = 0.2
+    detection_threshold: float = 0.4
 
     dbpath: Path = Path.home() / "storages" / "acoupi.db"
 

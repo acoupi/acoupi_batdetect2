@@ -228,5 +228,5 @@ def test_management_tempfile_negative_detection(
                 program_config.audio_directories.audio_dir_false.glob("*.wav")
             )
         )
-        != 0
+        == 0
     )
