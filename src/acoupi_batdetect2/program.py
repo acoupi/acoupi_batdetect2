@@ -89,7 +89,11 @@ class BatDetect2_Program(AcoupiProgram):
             message_store=self.message_store,
             logger=self.logger.getChild("detection"),
             output_cleaners=self.create_modeloutput_cleaners(config),
-            message_factories=[components.DetectionThresholdMessageBuilder(detection_threshold=config.detection_threshold)],
+            message_factories=[
+                components.DetectionThresholdMessageBuilder(
+                    detection_threshold=config.detection_threshold
+                )
+            ],
         )
 
         # Step 3 - Files Management Task
