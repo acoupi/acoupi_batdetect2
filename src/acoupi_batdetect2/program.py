@@ -5,8 +5,8 @@ from typing import Optional
 
 import pytz
 from acoupi import components, data, tasks
-from acoupi.programs.custom.base import AcoupiProgram
-from acoupi.programs.custom.workers import AcoupiWorker, WorkerConfig
+from acoupi.programs.core.base import AcoupiProgram
+from acoupi.programs.core.workers import AcoupiWorker, WorkerConfig
 
 from acoupi_batdetect2.configuration import BatDetect2_ConfigSchema
 from acoupi_batdetect2.model import BatDetect2
