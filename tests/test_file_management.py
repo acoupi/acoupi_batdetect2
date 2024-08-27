@@ -4,7 +4,7 @@ from typing import Generator
 
 import pytest
 from acoupi import data
-from acoupi.files import get_temp_files
+from acoupi.system.files import get_temp_files
 
 from acoupi_batdetect2.configuration import (
     BatDetect2_ConfigSchema,

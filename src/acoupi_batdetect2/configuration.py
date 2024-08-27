@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Annotated, Optional
 
 from acoupi.components.audio_recorder import MicrophoneConfig
-from acoupi.files import TEMP_PATH
+from acoupi.system.files import TEMP_PATH
 from acoupi.programs.core.base import NoUserPrompt
 from pydantic import BaseModel, Field
 
