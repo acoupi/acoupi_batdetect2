@@ -83,7 +83,9 @@ class BatDetect2_Program(AcoupiProgram):
         )
 
         # Step 2 - Model Detections Task
-        detection_task = tasks.generate_detection_task(
+        #detection_task = tasks.generate_detection_task(
+        #detection_task = tasks.generate_pyinstrument_task(
+        detection_task = tasks.generate_cprofile_task(
             store=self.store,
             model=self.model,
             message_store=self.message_store,
@@ -94,6 +96,7 @@ class BatDetect2_Program(AcoupiProgram):
                     detection_threshold=config.detection_threshold
                 )
             ],
+            profile_output="fulloutput.prof",
         )
 
         # Step 3 - Files Management Task
@@ -104,6 +107,7 @@ class BatDetect2_Program(AcoupiProgram):
             file_filters=self.create_file_filters(config),
             temp_path=config.tmp_path,
         )
+
         # Step 4 - Summariser Task
         summary_task = tasks.generate_summariser_task(
             summarisers=self.create_summariser(config),
@@ -130,7 +134,7 @@ class BatDetect2_Program(AcoupiProgram):
 
         self.add_task(
             function=file_management_task,
-            schedule=datetime.timedelta(seconds=30),
+            schedule=datetime.timedelta(seconds=120),
         )
 
         if (
