@@ -18,8 +18,8 @@ class AudioConfig(BaseModel):
     audio_duration: int = 3
     """Duration of each audio recording in seconds."""
 
-    recording_interval: int = 5
-    """Interval between each audio recording in seconds."""
+    recording_interval: int = 12
+    """Interval between each audio recording in seconds. Need time to run model inference."""
 
     chunksize: int = 8192
     """Chunksize of audio recording."""
@@ -28,17 +28,17 @@ class AudioConfig(BaseModel):
 class RecordingSchedule(BaseModel):
     """Recording schedule config."""
 
-    start_recording: datetime.time = datetime.time(hour=10, minute=0, second=0)
+    start_recording: datetime.time = datetime.time(hour=20, minute=0, second=0)
 
-    end_recording: datetime.time = datetime.time(hour=5, minute=0, second=0)
+    end_recording: datetime.time = datetime.time(hour=6, minute=0, second=0)
 
 
 class SaveRecordingFilter(BaseModel):
     """Recording saving options configuration."""
 
-    starttime: datetime.time = datetime.time(hour=10, minute=0, second=0)
+    starttime: datetime.time = datetime.time(hour=20, minute=0, second=0)
 
-    endtime: datetime.time = datetime.time(hour=5, minute=0, second=0)
+    endtime: datetime.time = datetime.time(hour=6, minute=0, second=0)
 
     saving_threshold: Optional[float] = 0.2
 
@@ -64,7 +64,7 @@ class AudioDirectories(BaseModel):
 class Summariser(BaseModel):
     """Summariser configuration."""
 
-    interval: Optional[float] = 0.5  # interval in minutes
+    interval: Optional[float] = 60  # interval in minutes
 
     low_band_threshold: Optional[float] = 0.0
 
@@ -150,3 +150,4 @@ class BatDetect2_ConfigSchema(BaseModel):
     http_message_config: Optional[HTTP_MessageConfig] = Field(
         default_factory=HTTP_MessageConfig,
     )
+

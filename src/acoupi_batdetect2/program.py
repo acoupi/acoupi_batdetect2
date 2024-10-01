@@ -38,15 +38,15 @@ class BatDetect2_Program(AcoupiProgram):
             1. Create Recording Task
             2. Create Detection Task
             3. Create File Management Task
-            4. Create Summary Task
-            5. Create Message Task
+            4. Create Message Task
+            5. Create Summary Task
         Section 2 - Add Tasks to BatDetect2 Program
         Section 3 - Configure Tasks based on BatDetect2 Configurations & User Inputs
             1. Store Directories
             2. Recording Conditions
             3. File Filters
-            4. Summarisers
-            5. Messengers
+            4. Messengers
+            5. Summarisers
         """
         self.validate_dirs(config)
         microphone = config.microphone_config
@@ -83,9 +83,7 @@ class BatDetect2_Program(AcoupiProgram):
         )
 
         # Step 2 - Model Detections Task
-        #detection_task = tasks.generate_detection_task(
-        #detection_task = tasks.generate_pyinstrument_task(
-        detection_task = tasks.generate_cprofile_task(
+        detection_task = tasks.generate_detection_task(
             store=self.store,
             model=self.model,
             message_store=self.message_store,
@@ -96,7 +94,6 @@ class BatDetect2_Program(AcoupiProgram):
                     detection_threshold=config.detection_threshold
                 )
             ],
-            profile_output="fulloutput.prof",
         )
 
         # Step 3 - Files Management Task
@@ -108,18 +105,18 @@ class BatDetect2_Program(AcoupiProgram):
             temp_path=config.tmp_path,
         )
 
-        # Step 4 - Summariser Task
-        summary_task = tasks.generate_summariser_task(
-            summarisers=self.create_summariser(config),
-            message_store=self.message_store,
-            logger=self.logger.getChild("summary"),
-        )
-
         # Step 5 - Send Data Task
         send_data_task = tasks.generate_send_data_task(
             message_store=self.message_store,
             messengers=self.create_messenger(config),
             logger=self.logger.getChild("messaging"),
+        )
+
+        # Step 5 - Summariser Task
+        summary_task = tasks.generate_summariser_task(
+            summarisers=self.create_summariser(config),
+            message_store=self.message_store,
+            logger=self.logger.getChild("summary"),
         )
 
         """ Section 2 - Add Tasks to BatDetect2 Program """
@@ -154,7 +151,6 @@ class BatDetect2_Program(AcoupiProgram):
         )
 
     """ Section 3 - Configure Tasks based on BatDetect2 Configurations & User Inputs """
-
     def validate_dirs(self, config: BatDetect2_ConfigSchema):
         """Validate Stores Directories."""
         # Check that directories to store audio files exists.
