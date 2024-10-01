@@ -4,7 +4,7 @@ from typing import Generator
 
 import pytest
 from acoupi import data
-from acoupi.files import get_temp_files
+from acoupi.system.files import get_temp_files
 
 from acoupi_batdetect2.configuration import (
     BatDetect2_ConfigSchema,
@@ -228,5 +228,5 @@ def test_management_tempfile_negative_detection(
                 program_config.audio_directories.audio_dir_false.glob("*.wav")
             )
         )
-        != 0
+        == 0
     )

@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import Annotated, Optional
 
 from acoupi.components.audio_recorder import MicrophoneConfig
-from acoupi.files import TEMP_PATH
-from acoupi.programs import NoUserPrompt
+from acoupi.system.files import TEMP_PATH
+from acoupi.programs.core.base import NoUserPrompt
 from pydantic import BaseModel, Field
 
 """Default paramaters for Batdetect2 Program"""
@@ -18,38 +18,29 @@ class AudioConfig(BaseModel):
     audio_duration: int = 3
     """Duration of each audio recording in seconds."""
 
-    recording_interval: int = 5
-    """Interval between each audio recording in seconds."""
+    recording_interval: int = 12
+    """Interval between each audio recording in seconds. Need time to run model inference."""
 
     chunksize: int = 8192
     """Chunksize of audio recording."""
-
-    # @model_validator(mode="after")
-    # def validate_audio_duration(cls, value):
-    #     """Validate audio duration."""
-    #
-    #     if value.audio_duration > value.recording_interval:
-    #         raise ValueError(
-    #             "Audio duration cannot be greater than recording interval."
-    #         )
-    #
-    #     return value
 
 
 class RecordingSchedule(BaseModel):
     """Recording schedule config."""
 
-    start_recording: datetime.time = datetime.time(hour=5, minute=30, second=0)
+    start_recording: datetime.time = datetime.time(hour=20, minute=0, second=0)
 
-    end_recording: datetime.time = datetime.time(hour=20, minute=0, second=0)
+    end_recording: datetime.time = datetime.time(hour=6, minute=0, second=0)
 
 
 class SaveRecordingFilter(BaseModel):
     """Recording saving options configuration."""
 
-    starttime: datetime.time = datetime.time(hour=9, minute=30, second=0)
+    starttime: datetime.time = datetime.time(hour=20, minute=0, second=0)
 
-    endtime: datetime.time = datetime.time(hour=20, minute=30, second=0)
+    endtime: datetime.time = datetime.time(hour=6, minute=0, second=0)
+
+    saving_threshold: Optional[float] = 0.2
 
     before_dawndusk_duration: Optional[int] = 0
 
@@ -58,8 +49,6 @@ class SaveRecordingFilter(BaseModel):
     frequency_duration: Optional[int] = 0
 
     frequency_interval: Optional[int] = 0
-
-    saving_threshold: Optional[float] = 0.2
 
 
 class AudioDirectories(BaseModel):
@@ -75,7 +64,7 @@ class AudioDirectories(BaseModel):
 class Summariser(BaseModel):
     """Summariser configuration."""
 
-    interval: Optional[float] = 0.5  # interval in minutes
+    interval: Optional[float] = 60  # interval in minutes
 
     low_band_threshold: Optional[float] = 0.0
 
@@ -123,7 +112,7 @@ class BatDetect2_ConfigSchema(BaseModel):
 
     name: str = "batdetect2"
 
-    detection_threshold: float = 0.2
+    detection_threshold: float = 0.4
 
     dbpath: Path = Path.home() / "storages" / "acoupi.db"
 
@@ -143,7 +132,7 @@ class BatDetect2_ConfigSchema(BaseModel):
         default_factory=RecordingSchedule,
     )
 
-    recording_saving: Optional[SaveRecordingFilter] = Field(
+    saving_filters: Optional[SaveRecordingFilter] = Field(
         default_factory=SaveRecordingFilter,
     )
 
@@ -161,3 +150,4 @@ class BatDetect2_ConfigSchema(BaseModel):
     http_message_config: Optional[HTTP_MessageConfig] = Field(
         default_factory=HTTP_MessageConfig,
     )
+

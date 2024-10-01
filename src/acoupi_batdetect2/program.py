@@ -5,8 +5,8 @@ from typing import Optional
 
 import pytz
 from acoupi import components, data, tasks
-from acoupi.programs.base import AcoupiProgram
-from acoupi.programs.workers import AcoupiWorker, WorkerConfig
+from acoupi.programs.core.base import AcoupiProgram
+from acoupi.programs.core.workers import AcoupiWorker, WorkerConfig
 
 from acoupi_batdetect2.configuration import BatDetect2_ConfigSchema
 from acoupi_batdetect2.model import BatDetect2
@@ -38,15 +38,15 @@ class BatDetect2_Program(AcoupiProgram):
             1. Create Recording Task
             2. Create Detection Task
             3. Create File Management Task
-            4. Create Summary Task
-            5. Create Message Task
+            4. Create Message Task
+            5. Create Summary Task
         Section 2 - Add Tasks to BatDetect2 Program
         Section 3 - Configure Tasks based on BatDetect2 Configurations & User Inputs
             1. Store Directories
             2. Recording Conditions
             3. File Filters
-            4. Summarisers
-            5. Messengers
+            4. Messengers
+            5. Summarisers
         """
         self.validate_dirs(config)
         microphone = config.microphone_config
@@ -60,12 +60,13 @@ class BatDetect2_Program(AcoupiProgram):
         )
 
         self.model = BatDetect2()
-        self.file_manager = components.SaveRecordingManager(
+        self.saving_manager = components.SaveRecordingManager(
             dirpath=config.audio_directories.audio_dir,
             dirpath_true=config.audio_directories.audio_dir_true,
             dirpath_false=config.audio_directories.audio_dir_false,
             timeformat=config.timeformat,
-            threshold=config.detection_threshold,
+            detection_threshold=config.detection_threshold,
+            saving_threshold=config.saving_filters.saving_threshold,
         )
         self.store = components.SqliteStore(config.dbpath)
         self.message_store = components.SqliteMessageStore(
@@ -87,32 +88,36 @@ class BatDetect2_Program(AcoupiProgram):
             model=self.model,
             message_store=self.message_store,
             logger=self.logger.getChild("detection"),
-            output_cleaners=self.create_detection_cleaners(config),
-            message_factories=[components.FullModelOutputMessageBuilder()],
-            # message_factories=[],
+            output_cleaners=self.create_modeloutput_cleaners(config),
+            message_factories=[
+                components.DetectionThresholdMessageBuilder(
+                    detection_threshold=config.detection_threshold
+                )
+            ],
         )
 
         # Step 3 - Files Management Task
         file_management_task = tasks.generate_file_management_task(
             store=self.store,
+            file_managers=[self.saving_manager],
             logger=self.logger.getChild("file_management"),
-            file_manager=self.file_manager,
             file_filters=self.create_file_filters(config),
             temp_path=config.tmp_path,
             required_models=["batdetect2"]
         )
 
-        summary_task = tasks.generate_summariser_task(
-            summarisers=self.create_summariser(config),
-            message_store=self.message_store,
-            logger=self.logger.getChild("summary"),
-        )
-
-        # Step 4 - Send Data Task
+        # Step 5 - Send Data Task
         send_data_task = tasks.generate_send_data_task(
             message_store=self.message_store,
             messengers=self.create_messenger(config),
             logger=self.logger.getChild("messaging"),
+        )
+
+        # Step 5 - Summariser Task
+        summary_task = tasks.generate_summariser_task(
+            summarisers=self.create_summariser(config),
+            message_store=self.message_store,
+            logger=self.logger.getChild("summary"),
         )
 
         """ Section 2 - Add Tasks to BatDetect2 Program """
@@ -127,7 +132,7 @@ class BatDetect2_Program(AcoupiProgram):
 
         self.add_task(
             function=file_management_task,
-            schedule=datetime.timedelta(seconds=30),
+            schedule=datetime.timedelta(seconds=120),
         )
 
         if (
@@ -147,7 +152,6 @@ class BatDetect2_Program(AcoupiProgram):
         )
 
     """ Section 3 - Configure Tasks based on BatDetect2 Configurations & User Inputs """
-
     def validate_dirs(self, config: BatDetect2_ConfigSchema):
         """Validate Stores Directories."""
         # Check that directories to store audio files exists.
@@ -190,43 +194,34 @@ class BatDetect2_Program(AcoupiProgram):
             )
         ]
 
-    def create_detection_cleaners(self, config: BatDetect2_ConfigSchema):
+    def create_modeloutput_cleaners(self, config: BatDetect2_ConfigSchema):
         """Create Detection Cleaners."""
         detection_cleaners = []
-
-        # Main detection_cleaner
-        # Will clean the model outputs by removing any detections that are
-        # below the threshold.
-        detection_cleaners.append(
-            components.ThresholdDetectionFilter(
-                threshold=config.detection_threshold,
-            ),
-        )
-
+        # No OutputCleaner Defined.
         return detection_cleaners
 
     def create_file_filters(self, config: BatDetect2_ConfigSchema):
         """Create File Filters."""
-        if not config.recording_saving:
+        if not config.saving_filters:
             # No saving filters defined
             return []
 
-        saving_filters = []
+        file_filters = []
         timezone = pytz.timezone(config.timezone)
-        recording_saving = config.recording_saving
+        saving_filters = config.saving_filters
 
-        # Main saving_file filter
+        # Main saving_filters for processed recrodings
         # Will only save recordings if the recording time is in the
         # interval defined by the start and end time.
         if (
-            recording_saving.starttime is not None
-            and recording_saving.endtime is not None
+            saving_filters.starttime is not None
+            and saving_filters.endtime is not None
         ):
-            saving_filters.append(
+            file_filters.append(
                 components.SaveIfInInterval(
                     interval=data.TimeInterval(
-                        start=recording_saving.starttime,
-                        end=recording_saving.endtime,
+                        start=saving_filters.starttime,
+                        end=saving_filters.endtime,
                     ),
                     timezone=timezone,
                 )
@@ -234,49 +229,49 @@ class BatDetect2_Program(AcoupiProgram):
 
         # Additional saving_file filters
         if (
-            recording_saving.frequency_duration != 0
-            and recording_saving.frequency_interval != 0
+            saving_filters.frequency_duration != 0
+            and saving_filters.frequency_interval != 0
         ):
             # This filter will only save recordings at a frequency defined
             # by the duration (length of time in which files are saved) and
             # interval (period of time between each duration in which files are not saved).
-            saving_filters.append(
+            file_filters.append(
                 components.FrequencySchedule(
-                    duration=recording_saving.frequency_duration,
-                    frequency=recording_saving.frequency_interval,
+                    duration=saving_filters.frequency_duration,
+                    frequency=saving_filters.frequency_interval,
                 )
             )
 
-        if recording_saving.before_dawndusk_duration != 0:
+        if saving_filters.before_dawndusk_duration != 0:
             # This filter will only save recordings if the recording time is
             # within the duration (lenght of time in minutes) before dawn and dusk.
-            saving_filters.append(
+            file_filters.append(
                 components.Before_DawnDuskTimeInterval(
-                    duration=recording_saving.before_dawndusk_duration,
+                    duration=saving_filters.before_dawndusk_duration,
                     timezone=timezone,
                 )
             )
 
-        if recording_saving.after_dawndusk_duration != 0:
+        if saving_filters.after_dawndusk_duration != 0:
             # This filter will only save recordings if the recording time is
             # within the duration (lenght of time in minutes) after dawn and dusk.
-            saving_filters.append(
+            file_filters.append(
                 components.After_DawnDuskTimeInterval(
-                    duration=recording_saving.after_dawndusk_duration,
+                    duration=saving_filters.after_dawndusk_duration,
                     timezone=timezone,
                 )
             )
 
-        if recording_saving.saving_threshold != 0.0:
+        if saving_filters.saving_threshold != 0.0:
             # This filter will only save recordings if the recording files
             # have a positive detection above the threshold.
-            saving_filters.append(
-                components.ThresholdRecordingFilter(
-                    threshold=recording_saving.saving_threshold,
+            file_filters.append(
+                components.SavingThreshold(
+                    saving_threshold=saving_filters.saving_threshold,
                 )
             )
 
-        return saving_filters
+        return file_filters
 
     def create_summariser(self, config: BatDetect2_ConfigSchema):
         """Create Summariser."""
