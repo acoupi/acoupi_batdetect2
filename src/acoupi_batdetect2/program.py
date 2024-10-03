@@ -14,6 +14,18 @@ from acoupi_batdetect2.model import BatDetect2
 
 
 class BatDetect2_Program(DetectionProgram[BatDetect2_ConfigSchema]):
+    """BatDetect2 Program Configuration
+
+    Section 1. Get configuration schema
+        - Get the specific configuration parameters for the batdetect2 program.
+
+    Section 2. Inherit template program from acoupi
+        - Get the functionality and structure of the `DetectionProgram`
+
+    Section 3. Define and configure supplementary tasks
+        - Implement the customised program configuration.
+    """
+
     config_schema = BatDetect2_ConfigSchema
 
     def setup(self, config):
