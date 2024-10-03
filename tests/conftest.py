@@ -21,7 +21,6 @@ from torch import true_divide
 
 from acoupi_batdetect2.configuration import (
     BatDetect2_ConfigSchema,
-    SaveRecordingFilter,
     SavingConfig,
 )
 from acoupi_batdetect2.program import BatDetect2_Program

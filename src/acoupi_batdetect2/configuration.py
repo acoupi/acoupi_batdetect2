@@ -40,7 +40,7 @@ class SavingConfig(BaseModel):
 
     saving_threshold: float = 0.2
 
-    saving_filters: Optional[SavingFiltersConfig] = Field(
+    filters: Optional[SavingFiltersConfig] = Field(
         default_factory=SavingFiltersConfig,
     )
 
