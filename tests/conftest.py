@@ -1,31 +1,36 @@
 """Common testing fixtures."""
 
 import datetime
+from os.path import exists
 from pathlib import Path
 
 import pyaudio
 import pytest
 from acoupi import components, data
+from acoupi.components import HTTPConfig, MicrophoneConfig, MQTTConfig
 from acoupi.devices.audio import get_input_devices
+from acoupi.programs.templates import (
+    AudioConfiguration,
+    MessagingConfig,
+    PathsConfiguration,
+)
 from acoupi.system.constants import CeleryConfig
 from celery import Celery
 from celery.worker import WorkController
+from torch import true_divide
 
 from acoupi_batdetect2.configuration import (
-    AudioDirectories,
     BatDetect2_ConfigSchema,
     SaveRecordingFilter,
+    SavingConfig,
 )
 from acoupi_batdetect2.program import BatDetect2_Program
 
 pytest_plugins = ("celery.contrib.pytest",)
 
-TEST_RECORDING: Path = (
-    Path(__file__).parent / "data" / "audiofile_test1_myomys.wav"
-)
-TEST_RECORDING_NOBAT: Path = (
-    Path(__file__).parent / "data" / "audiofile_test3_nobats.wav"
-)
+TESTS_DIR = Path(__file__).parent
+TEST_RECORDING = TESTS_DIR / "data" / "audiofile_test1_myomys.wav"
+TEST_RECORDING_NOBAT = TESTS_DIR / "data" / "audiofile_test3_nobats.wav"
 
 
 @pytest.fixture(autouse=True)
@@ -41,7 +46,7 @@ def recording() -> data.Recording:
         path=TEST_RECORDING,
         duration=3,
         samplerate=192000,
-        datetime=datetime.datetime.now(),
+        created_on=datetime.datetime.now(),
         deployment=data.Deployment(
             name="test",
         ),
@@ -54,7 +59,7 @@ def notbat_recording() -> data.Recording:
         path=TEST_RECORDING_NOBAT,
         duration=3,
         samplerate=192000,
-        datetime=datetime.datetime.now(),
+        created_on=datetime.datetime.now(),
         deployment=data.Deployment(
             name="test_nobats",
         ),
@@ -62,40 +67,56 @@ def notbat_recording() -> data.Recording:
 
 
 @pytest.fixture
-def microphone_config() -> components.MicrophoneConfig:
-    p = pyaudio.PyAudio()
-    devices = get_input_devices(p)
+def paths_config(tmp_path: Path) -> PathsConfiguration:
+    tmp_audio = tmp_path / "tmp"
+    recordings = tmp_path / "audio"
+    tmp_audio.mkdir(parents=True, exist_ok=True)
+    recordings.mkdir(parents=True, exist_ok=True)
+    return PathsConfiguration(
+        tmp_audio=tmp_path / "tmp",
+        recordings=tmp_path / "audio",
+        db_metadata=tmp_path / "metadata.db",
+    )
 
-    p.terminate()
-    assert len(devices) > 0
 
-    device = devices[0]
-    return components.MicrophoneConfig(
-        device_name=device.name,
-        samplerate=int(device.default_samplerate),
-        audio_channels=device.max_input_channels,
+@pytest.fixture
+def audio_config() -> AudioConfiguration:
+    return AudioConfiguration(duration=1, interval=2)
+
+
+@pytest.fixture
+def microphone_config():
+    return MicrophoneConfig(
+        samplerate=44100,
+        audio_channels=1,
+        device_name="default",
+    )
+
+
+@pytest.fixture
+def messaging_config(tmp_path: Path) -> MessagingConfig:
+    return MessagingConfig(
+        messages_db=tmp_path / "messages.db",
+        http=HTTPConfig(
+            base_url="http://localhost:8000",
+        ),
     )
 
 
 @pytest.fixture
 def program_config(
-    tmp_path: Path,
-    microphone_config: components.MicrophoneConfig,
+    messaging_config: MessagingConfig,
+    paths_config: PathsConfiguration,
+    audio_config: AudioConfiguration,
+    microphone_config: MicrophoneConfig,
 ) -> BatDetect2_ConfigSchema:
-    audio_temp_path = tmp_path / "temp_audio"
-    audio_temp_path.mkdir(exist_ok=True, parents=True)
     return BatDetect2_ConfigSchema(
-        tmp_path=audio_temp_path,
-        dbpath=tmp_path / "test.db",
-        dbpath_messages=tmp_path / "test_messages.db",
-        microphone_config=microphone_config,
-        audio_directories=AudioDirectories(
-            audio_dir=tmp_path / "audio",
-            audio_dir_true=tmp_path / "audio_true",
-            audio_dir_false=tmp_path / "audio_false",
-        ),
-        recording_saving=SaveRecordingFilter(
-            saving_threshold=None,
+        paths=paths_config,
+        messaging=messaging_config,
+        recording=audio_config,
+        microphone=microphone_config,
+        saving=SavingConfig(
+            filters=None,
         ),
     )
 
@@ -109,12 +130,10 @@ def celery_config():
 def program(
     program_config: BatDetect2_ConfigSchema,
     celery_app: Celery,
-    celery_config: dict,
     celery_worker: WorkController,
 ) -> BatDetect2_Program:
     program = BatDetect2_Program(
         program_config=program_config,
-        celery_config=CeleryConfig.model_validate(celery_config),
         app=celery_app,
     )
     program.logger.setLevel("DEBUG")

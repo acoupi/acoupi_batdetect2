@@ -19,13 +19,13 @@ def temp_recording(
 ) -> Generator[data.Recording, None, None]:
     """Create a temporary recording."""
     assert recording.path is not None
-    temp_recording_path = program_config.tmp_path / recording.path.name
+    temp_recording_path = program_config.paths.tmp_audio / recording.path.name
     shutil.copyfile(recording.path, temp_recording_path)
     yield data.Recording(
         path=temp_recording_path,
         duration=3,
         samplerate=192000,
-        datetime=datetime.datetime.now(),
+        created_on=datetime.datetime.now(),
         deployment=data.Deployment(
             name="test",
         ),
@@ -42,15 +42,17 @@ def nobat_temp_recording(
 ) -> Generator[data.Recording, None, None]:
     """Create a temporary recording."""
     assert notbat_recording.path is not None
+
     temp_recording_path_nobat = (
-        program_config.tmp_path / notbat_recording.path.name
+        program_config.paths.tmp_audio / notbat_recording.path.name
     )
+
     shutil.copyfile(notbat_recording.path, temp_recording_path_nobat)
     yield data.Recording(
         path=temp_recording_path_nobat,
         duration=3,
         samplerate=192000,
-        datetime=datetime.datetime.now(),
+        created_on=datetime.datetime.now(),
         deployment=data.Deployment(
             name="test",
         ),
@@ -63,12 +65,9 @@ def test_management_notempfiles(
     program_config: BatDetect2_ConfigSchema,
     program: BatDetect2_Program,
 ):
-    assert len(get_temp_files(path=program_config.tmp_path)) == 0
-    assert program_config.audio_directories.audio_dir.exists()
-    assert (
-        len(list(program_config.audio_directories.audio_dir.glob("*.wav")))
-        == 0
-    )
+    assert len(get_temp_files(path=program_config.paths.tmp_audio)) == 0
+    assert program_config.paths.recordings.exists()
+    assert len(list(program_config.paths.recordings.glob("*.wav"))) == 0
 
     assert "file_management_task" in program.tasks
 
@@ -82,12 +81,9 @@ def test_management_tempfile_notindb(
     temp_recording: data.Recording,
 ):
     """Test that a recording file exists in the temporary directory but not in the database."""
-    assert len(get_temp_files(path=program_config.tmp_path)) != 0
-    assert program_config.audio_directories.audio_dir.exists()
-    assert (
-        len(list(program_config.audio_directories.audio_dir.glob("*.wav")))
-        == 0
-    )
+    assert len(get_temp_files(path=program_config.paths.tmp_audio)) != 0
+    assert program_config.paths.recordings.exists()
+    assert len(list(program_config.paths.recordings.glob("*.wav"))) == 0
     assert temp_recording.path is not None
 
     assert program.store.get_recordings_by_path([temp_recording.path]) == []
@@ -105,12 +101,9 @@ def test_management_tempfiles_notprocess(
     program: BatDetect2_Program,
     temp_recording: data.Recording,
 ):
-    assert len(get_temp_files(path=program_config.tmp_path)) != 0
-    assert program_config.audio_directories.audio_dir.exists()
-    assert (
-        len(list(program_config.audio_directories.audio_dir.glob("*.wav")))
-        == 0
-    )
+    assert len(get_temp_files(path=program_config.paths.tmp_audio)) != 0
+    assert program_config.paths.recordings.exists()
+    assert len(list(program_config.paths.recordings.glob("*.wav"))) == 0
     assert temp_recording.path is not None
 
     # Store test recording in the database to test the test.
@@ -120,10 +113,12 @@ def test_management_tempfiles_notprocess(
     assert program.store.get_recordings_by_path([temp_recording.path]) != []
 
     # Retrieve the recording from the database.
-    recordings = program.store.get_recordings_by_path([temp_recording.path])
+    results = program.store.get_recordings_by_path([temp_recording.path])
 
     # Check that the recording was stored in the database but no detection exists.
-    assert len(recordings) >= 1
+    assert len(results) == 1
+    _, model_outputs = results[0]
+    assert len(model_outputs) == 0
 
     assert "file_management_task" in program.tasks
     output_file_task = program.tasks["file_management_task"].delay()
@@ -138,19 +133,14 @@ def test_management_tempfile_positive_detection(
     program: BatDetect2_Program,
     temp_recording: data.Recording,
 ):
-    assert len(get_temp_files(path=program_config.tmp_path)) != 0
-    assert program_config.audio_directories.audio_dir.exists()
-    assert program_config.audio_directories.audio_dir_true.exists()
-    assert (
-        len(list(program_config.audio_directories.audio_dir.glob("*.wav")))
-        == 0
-    )
-    assert (
-        len(
-            list(program_config.audio_directories.audio_dir_true.glob("*.wav"))
-        )
-        == 0
-    )
+    audio_dir = program_config.paths.recordings
+    true_dir = audio_dir / program_config.saving.true_dir
+
+    assert len(get_temp_files(path=program_config.paths.tmp_audio)) != 0
+    assert audio_dir.exists()
+    assert (audio_dir / program_config.saving.true_dir).exists()
+    assert len(list(audio_dir.glob("*.wav"))) == 0
+    assert len(list(true_dir.glob("*.wav"))) == 0
 
     # Store test recording in the database to test the test.
     program.store.store_recording(temp_recording)
@@ -168,13 +158,8 @@ def test_management_tempfile_positive_detection(
     output_file_task.get()
 
     # Check that the file was moved.
-    assert len(get_temp_files(path=program_config.tmp_path)) == 0
-    assert (
-        len(
-            list(program_config.audio_directories.audio_dir_true.glob("*.wav"))
-        )
-        != 0
-    )
+    assert len(get_temp_files(path=program_config.paths.tmp_audio)) == 0
+    assert len(list(true_dir.glob("*.wav"))) != 0
 
 
 def test_management_tempfile_negative_detection(
@@ -186,18 +171,14 @@ def test_management_tempfile_negative_detection(
 
     # Make sure there is a single file in the temporary audio folder but
     # the audio directories are empty.
-    assert len(get_temp_files(path=program_config.tmp_path)) != 0
-    assert program_config.audio_directories.audio_dir.exists()
-    assert program_config.audio_directories.audio_dir_true.exists()
-    assert program_config.audio_directories.audio_dir_false.exists()
-    assert (
-        len(
-            list(
-                program_config.audio_directories.audio_dir_false.glob("*.wav")
-            )
-        )
-        == 0
-    )
+    audio_dir = program_config.paths.recordings
+    true_dir = audio_dir / program_config.saving.true_dir
+    false_dir = audio_dir / program_config.saving.false_dir
+    assert len(get_temp_files(path=program_config.paths.tmp_audio)) != 0
+    assert audio_dir.exists()
+    assert true_dir.exists()
+    assert false_dir.exists()
+    assert len(list(false_dir.glob("*.wav"))) == 0
 
     # Store test recording in the database to test the test.
     program.store.store_recording(nobat_temp_recording)
@@ -221,12 +202,5 @@ def test_management_tempfile_negative_detection(
     output_file_task.get()
 
     # Check that the file was moved.
-    assert len(get_temp_files(path=program_config.tmp_path)) == 0
-    assert (
-        len(
-            list(
-                program_config.audio_directories.audio_dir_false.glob("*.wav")
-            )
-        )
-        == 0
-    )
+    assert len(get_temp_files(path=program_config.paths.tmp_audio)) == 0
+    assert len(list(false_dir.glob("*.wav"))) == 0

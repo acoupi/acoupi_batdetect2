@@ -12,7 +12,7 @@ def test_can_run_detection_program(
     program_config: BatDetect2_ConfigSchema,
 ):
     """Test can run detection program."""
-    store = components.SqliteStore(program_config.dbpath)
+    store = components.SqliteStore(program_config.paths.db_metadata)
 
     # Store test recording in the database to test the program.
     store.store_recording(recording)

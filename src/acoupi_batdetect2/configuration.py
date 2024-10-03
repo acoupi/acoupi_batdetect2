@@ -1,36 +1,10 @@
 """Batdetect2 Program Configuration Options."""
 
 import datetime
-from pathlib import Path
-from typing import Annotated, Optional
+from typing import Optional
 
-from acoupi.components.audio_recorder import MicrophoneConfig
-from acoupi.system.files import TEMP_PATH
-from acoupi.programs.core.base import NoUserPrompt
+from acoupi.programs.templates import DetectionProgramConfiguration
 from pydantic import BaseModel, Field
-
-"""Default paramaters for Batdetect2 Program"""
-
-
-class AudioConfig(BaseModel):
-    """Audio recording configuration parameters."""
-
-    audio_duration: int = 3
-    """Duration of each audio recording in seconds."""
-
-    recording_interval: int = 12
-    """Interval between each audio recording in seconds. Need time to run model inference."""
-
-    chunksize: int = 8192
-    """Chunksize of audio recording."""
-
-
-class RecordingSchedule(BaseModel):
-    """Recording schedule config."""
-
-    start_recording: datetime.time = datetime.time(hour=20, minute=0, second=0)
-
-    end_recording: datetime.time = datetime.time(hour=6, minute=0, second=0)
 
 
 class SaveRecordingFilter(BaseModel):
@@ -51,16 +25,6 @@ class SaveRecordingFilter(BaseModel):
     frequency_interval: Optional[int] = 0
 
 
-class AudioDirectories(BaseModel):
-    """Audio Recording Directories configuration."""
-
-    audio_dir: Path = Path.home() / "storages" / "recordings"
-
-    audio_dir_true: Path = Path.home() / "storages" / "recordings" / "bats"
-
-    audio_dir_false: Path = Path.home() / "storages" / "recordings" / "no_bats"
-
-
 class Summariser(BaseModel):
     """Summariser configuration."""
 
@@ -73,81 +37,45 @@ class Summariser(BaseModel):
     high_band_threshold: Optional[float] = 0.0
 
 
-class MQTT_MessageConfig(BaseModel):
-    """MQTT configuration to send messages."""
+class SavingFiltersConfig(BaseModel):
+    starttime: datetime.time = datetime.time(hour=20, minute=0, second=0)
 
-    host: str = "default_host"
+    endtime: datetime.time = datetime.time(hour=6, minute=0, second=0)
 
-    port: int = 1884
+    before_dawndusk_duration: Optional[int] = 0
 
-    client_username: str = "guest_username"
+    after_dawndusk_duration: Optional[int] = 0
 
-    client_password: str = "guest_password"
+    frequency_duration: Optional[int] = 0
 
-    topic: str = "mqtt-topic"
-
-    clientid: str = "mqtt-clientid"
+    frequency_interval: Optional[int] = 0
 
 
-class HTTP_MessageConfig(BaseModel):
-    """MQTT configuration to send messages."""
+class SavingConfig(BaseModel):
+    true_dir: str = "bats"
 
-    deviceid: str = "device-id"
-
-    baseurl: str = "base-url"
-
-    client_password: str = "guest_password"
-
-    client_id: str = "guest_clientid"
-
-    api_key: str = "guest_apikey"
-
-    content_type: str = "application-json"
-
-
-class BatDetect2_ConfigSchema(BaseModel):
-    """BatDetect2 Configuration Schematic."""
-
-    tmp_path: Annotated[Path, NoUserPrompt] = TEMP_PATH
-
-    name: str = "batdetect2"
-
-    detection_threshold: float = 0.4
-
-    dbpath: Path = Path.home() / "storages" / "acoupi.db"
-
-    dbpath_messages: Path = Path.home() / "storages" / "acoupi_messages.db"
+    false_dir: str = "no_bats"
 
     timeformat: str = "%Y%m%d_%H%M%S"
 
-    timezone: str = "Europe/London"
+    saving_threshold: float = 0.2
 
-    microphone_config: MicrophoneConfig
-
-    audio_config: AudioConfig = Field(
-        default_factory=AudioConfig,
+    filters: Optional[SavingFiltersConfig] = Field(
+        default_factory=SavingFiltersConfig,
     )
 
-    recording_schedule: RecordingSchedule = Field(
-        default_factory=RecordingSchedule,
-    )
 
-    saving_filters: Optional[SaveRecordingFilter] = Field(
-        default_factory=SaveRecordingFilter,
-    )
+class ModelConfig(BaseModel):
+    detection_threshold: float = 0.4
 
-    audio_directories: AudioDirectories = Field(
-        default_factory=AudioDirectories,
-    )
 
+class BatDetect2_ConfigSchema(DetectionProgramConfiguration):
     summariser_config: Optional[Summariser] = Field(
         default_factory=Summariser,
     )
 
-    mqtt_message_config: Optional[MQTT_MessageConfig] = Field(
-        default_factory=MQTT_MessageConfig,
-    )
-    http_message_config: Optional[HTTP_MessageConfig] = Field(
-        default_factory=HTTP_MessageConfig,
+    model: ModelConfig = Field(
+        default_factory=ModelConfig,
     )
 
+    saving: SavingConfig = Field(default_factory=SavingConfig)

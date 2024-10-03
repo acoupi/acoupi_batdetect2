@@ -3,39 +3,31 @@ name = "acoupi-batdetect2"
 version = "0.1.0"
 description = "An acoupi-compatible BatDetect2 model and program."
 authors = [
-    {name = "Aude Vuilliomenet", email = "aude.vuilliomenet.18@ucl.ac.uk"}, 
-    {name = "Santiago Martinez Balvanera", email="santiago.balvanera.20@ucl.uk.ac"},
+  { name = "Aude Vuilliomenet", email = "aude.vuilliomenet.18@ucl.ac.uk" },
+  { name = "Santiago Martinez Balvanera", email = "santiago.balvanera.20@ucl.uk.ac" },
 ]
 
 dependencies = [
-    "acoupi",
-    "batdetect2>=1.0.7",
-    "pydantic-settings>=2.1.0",
-    "pygments>=2.18.0",
+  "acoupi",
+  "batdetect2>=1.0.7",
+  "pydantic-settings>=2.1.0",
+  "pygments>=2.18.0",
 ]
 
 requires-python = ">=3.9,<3.11"
 readme = "README.md"
-license = {text = "Creative Commons Attribution-NonCommercial 4.0 International"}
+license = { text = "Creative Commons Attribution-NonCommercial 4.0 International" }
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.pdm.dev-dependencies]
-dev = [
-    "acoupi @ file:///home/pi/acoupi",
-    "pytest>=7.4.3",
-    "pytest-celery>=0.0.0",
-]
-
-[tool.rye]
+[tool.uv]
 dev-dependencies = [
-    "acoupi @ file://../acoupi",
-    "pytest>=7.4.3",
-    "pytest-celery>=0.0.0",
-    "pyright>=1.1.363",
-    "ruff>=0.4.4",
+  "pytest>=7.4.3",
+  "pytest-celery>=0.0.0",
+  "pyright>=1.1.363",
+  "ruff>=0.4.4",
 ]
 
 [tool.ruff]
