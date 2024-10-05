@@ -3,7 +3,10 @@
 import datetime
 from typing import Optional
 
-from acoupi.programs.templates import DetectionProgramConfiguration
+from acoupi.programs.templates import (
+    AudioConfiguration,
+    DetectionProgramConfiguration,
+)
 from pydantic import BaseModel, Field
 
 
@@ -30,7 +33,10 @@ class SavingFiltersConfig(BaseModel):
 
 
 class SavingConfig(BaseModel):
-    """Saving configuration for audio recordings (path to storage, name of files, saving threshold)."""
+    """Saving configuration for audio recordings.
+
+    (path to storage, name of files, saving threshold).
+    """
 
     true_dir: str = "bats"
 
@@ -57,8 +63,22 @@ class Summariser(BaseModel):
     high_band_threshold: Optional[float] = 0.0
 
 
+class BatDetect2_AudioConfig(AudioConfiguration):
+    schedule_start: datetime.time = Field(
+        default=datetime.time(hour=18, minute=0, second=0),
+    )
+
+    schedule_end: datetime.time = Field(
+        default=datetime.time(hour=6, minute=0, second=0),
+    )
+
+
 class BatDetect2_ConfigSchema(DetectionProgramConfiguration):
     """Configuration for the batdetct2 program."""
+
+    recording: AudioConfiguration = Field(
+        default_factory=BatDetect2_AudioConfig,
+    )
 
     model: ModelConfig = Field(
         default_factory=ModelConfig,
