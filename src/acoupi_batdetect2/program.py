@@ -14,7 +14,7 @@ from acoupi_batdetect2.model import BatDetect2
 
 
 class BatDetect2_Program(DetectionProgram[BatDetect2_ConfigSchema]):
-    """BatDetect2 Program Configuration
+    """BatDetect2 Program Configuration.
 
     Section 1. Get configuration schema
         - Get the specific configuration parameters for the batdetect2 program.
@@ -40,9 +40,7 @@ class BatDetect2_Program(DetectionProgram[BatDetect2_ConfigSchema]):
 
             self.add_task(
                 function=summary_task,
-                schedule=datetime.timedelta(
-                    minutes=config.summariser_config.interval
-                ),
+                schedule=datetime.timedelta(minutes=config.summariser_config.interval),
             )
 
     def configure_model(self, config):
@@ -86,8 +84,7 @@ class BatDetect2_Program(DetectionProgram[BatDetect2_ConfigSchema]):
             components.SaveRecordingManager(
                 dirpath=config.paths.recordings,
                 dirpath_true=config.paths.recordings / config.saving.true_dir,
-                dirpath_false=config.paths.recordings
-                / config.saving.false_dir,
+                dirpath_false=config.paths.recordings / config.saving.false_dir,
                 timeformat=config.saving.timeformat,
                 detection_threshold=config.model.detection_threshold,
                 saving_threshold=config.saving.saving_threshold,
@@ -101,77 +98,64 @@ class BatDetect2_Program(DetectionProgram[BatDetect2_ConfigSchema]):
             )
         ]
 
-    def get_recording_filters(
-        self, config
-    ) -> list[types.RecordingSavingFilter]:
-        if not config.saving.filters:
+    def get_recording_filters(self, config) -> list[types.RecordingSavingFilter]:
+        if not config.recording_saving:
             # No saving filters defined
             return []
 
-        recording_filters = []
-
+        saving_filters = []
         timezone = pytz.timezone(config.timezone)
-        saving_filters = config.saving.filters
+        recording_saving = config.recording_saving
 
-        # Main saving_filters for processed recrodings
+        # Main filter
         # Will only save recordings if the recording time is in the
         # interval defined by the start and end time.
         if (
-            saving_filters.starttime is not None
-            and saving_filters.endtime is not None
+            recording_saving.starttime is not None
+            and recording_saving.endtime is not None
         ):
-            recording_filters.append(
+            saving_filters.append(
                 components.SaveIfInInterval(
                     interval=data.TimeInterval(
-                        start=saving_filters.starttime,
-                        end=saving_filters.endtime,
+                        start=recording_saving.starttime,
+                        end=recording_saving.endtime,
                     ),
                     timezone=timezone,
                 )
             )
 
-        # Additional saving_file filters
+        # Additional filters
         if (
-            saving_filters.frequency_duration
-            and saving_filters.frequency_interval
+            recording_saving.frequency_duration != 0
+            and recording_saving.frequency_interval != 0
         ):
             # This filter will only save recordings at a frequency defined
-            # by the duration (length of time in which files are saved) and
-            # interval (period of time between each duration in which files are not saved).
-            recording_filters.append(
+            # by the duration and interval.
+            saving_filters.append(
                 components.FrequencySchedule(
-                    duration=saving_filters.frequency_duration,
-                    frequency=saving_filters.frequency_interval,
+                    duration=recording_saving.frequency_duration,
+                    frequency=recording_saving.frequency_interval,
                 )
             )
 
-        if saving_filters.before_dawndusk_duration:
-            # This filter will only save recordings if the recording time is
-            # within the duration (lenght of time in minutes) before dawn and dusk.
-            recording_filters.append(
+        if recording_saving.before_dawndusk_duration != 0:
+            # This filter will only save recordings if the recording time
+            # is before dawn or dusk.
+            saving_filters.append(
                 components.Before_DawnDuskTimeInterval(
-                    duration=saving_filters.before_dawndusk_duration,
+                    duration=recording_saving.before_dawndusk_duration,
                     timezone=timezone,
                 )
             )
 
-        if saving_filters.after_dawndusk_duration:
-            # This filter will only save recordings if the recording time is
-            # within the duration (lenght of time in minutes) after dawn and dusk.
-            recording_filters.append(
+        if recording_saving.after_dawndusk_duration != 0:
+            # This filter will only save recordings if the recording time
+            # is after dawn or dusk.
+            saving_filters.append(
                 components.After_DawnDuskTimeInterval(
-                    duration=saving_filters.after_dawndusk_duration,
+                    duration=recording_saving.after_dawndusk_duration,
                     timezone=timezone,
                 )
             )
 
-        if config.saving.saving_threshold:
-            # This filter will only save recordings if the recording files
-            # have a positive detection above the threshold.
-            recording_filters.append(
-                components.SavingThreshold(
-                    saving_threshold=config.saving.saving_threshold,
-                )
-            )
-
-        return recording_filters
+        return saving_filters
