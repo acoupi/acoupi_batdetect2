@@ -54,7 +54,7 @@ class SavingConfig(BaseModel):
 class Summariser(BaseModel):
     """Summariser configuration."""
 
-    interval: Optional[float] = 60  # interval in minutes
+    interval: Optional[float] = 3600  # interval in seconds
 
     low_band_threshold: Optional[float] = 0.0
 
