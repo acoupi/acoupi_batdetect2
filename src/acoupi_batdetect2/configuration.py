@@ -19,9 +19,9 @@ class ModelConfig(BaseModel):
 class SavingFiltersConfig(BaseModel):
     """Saving Filters for audio recordings configuration."""
 
-    starttime: datetime.time = datetime.time(hour=20, minute=0, second=0)
+    starttime: datetime.time = datetime.time(hour=19, minute=0, second=0)
 
-    endtime: datetime.time = datetime.time(hour=6, minute=0, second=0)
+    endtime: datetime.time = datetime.time(hour=7, minute=0, second=0)
 
     before_dawndusk_duration: int = 0
 
@@ -65,11 +65,11 @@ class Summariser(BaseModel):
 
 class BatDetect2_AudioConfig(AudioConfiguration):
     schedule_start: datetime.time = Field(
-        default=datetime.time(hour=18, minute=0, second=0),
+        default=datetime.time(hour=21, minute=0, second=0),
     )
 
     schedule_end: datetime.time = Field(
-        default=datetime.time(hour=6, minute=0, second=0),
+        default=datetime.time(hour=23, minute=0, second=0),
     )
 
 

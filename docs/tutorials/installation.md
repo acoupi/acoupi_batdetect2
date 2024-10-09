@@ -24,9 +24,9 @@ We recommend the following hardware elements to install and run _acoupi_.
 
 To install and use *acoupi_batdetect" on your embedded device follow these steps:
 
-**Step 1:** Install *acoupi_batdetect2* and its dependencies
+**Step 1:** Install *acoupi_batdetect2* and its dependencies.
 
-!!! Example "CLI Command: install acoupi"
+!!! Example "CLI Command: install *acoupi_batdetect2*"
 
     ```bash
     curl -sSL https://github.com/acoupi_batdetect2/install_script.sh | bash
@@ -34,9 +34,9 @@ To install and use *acoupi_batdetect" on your embedded device follow these steps
 
 **Step 2:** Configure the *acoupi_batdetect2* program.
 
-*acoupi_batdetect2* program includes multiple components for recording, processing, saving and deleting audio files, as well as sending detections and summary messages to a remote server. To start configuring the program according to your needs, enter the command: 
+*acoupi_batdetect2* program includes multiple components for recording, processing, saving and deleting audio files, as well as sending detections and summary messages to a remote server. Enter the following command to configure the program according to your needs.
 
-!!! Example "CLI Command: setup *acoupi_batdetect* program"
+!!! Example "CLI Command: configure *acoupi_batdetect* program"
 
     ```bash
     acoupi setup --program acoupi_batdetect2.program
@@ -53,11 +53,3 @@ To install and use *acoupi_batdetect" on your embedded device follow these steps
 ??? tip "Using _acoupi_ from the command line"
 
     To check what are the available commands for _acoupi_, enter `acoupi --help`. Also look at the [CLI documentation](../reference/cli.md) for further info.
-
-## Other _acoupi_ installation
-
-Sometimes the programs might have some additional or different installation requirements.
-Please refer to the following links, if you wish to setup _acoupi_ with one of the pre-built bioacoustics classifiers model.
-
-- [acoupi-batdetect2](https://github.com/acoupi/acoupi_batdetect2) (Classifiers for UK bats species)
-- [acoupi-birdnet](https://github.com/acoupi/acoupi_birdnet) (Classifiers for bird species)
