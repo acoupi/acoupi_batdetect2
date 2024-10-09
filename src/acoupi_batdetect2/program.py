@@ -112,7 +112,8 @@ class BatDetect2_Program(DetectionProgram[BatDetect2_ConfigSchema]):
         # Will only save recordings if the recording time is in the
         # interval defined by the start and end time.
         if (
-            recording_saving.filters.starttime is not None
+            recording_saving.filters is not None
+            and recording_saving.filters.starttime is not None
             and recording_saving.filters.endtime is not None
         ):
             saving_filters.append(
@@ -127,7 +128,8 @@ class BatDetect2_Program(DetectionProgram[BatDetect2_ConfigSchema]):
 
         # Additional filters
         if (
-            recording_saving.filters.frequency_duration != 0
+            recording_saving.filters is not None
+            and recording_saving.filters.frequency_duration != 0
             and recording_saving.filters.frequency_interval != 0
         ):
             # This filter will only save recordings at a frequency defined
@@ -139,7 +141,10 @@ class BatDetect2_Program(DetectionProgram[BatDetect2_ConfigSchema]):
                 )
             )
 
-        if recording_saving.filters.before_dawndusk_duration != 0:
+        if (
+            recording_saving.filters is not None
+            and recording_saving.filters.before_dawndusk_duration != 0
+        ):
             # This filter will only save recordings if the recording time
             # is before dawn or dusk.
             saving_filters.append(
@@ -149,7 +154,10 @@ class BatDetect2_Program(DetectionProgram[BatDetect2_ConfigSchema]):
                 )
             )
 
-        if recording_saving.filters.after_dawndusk_duration != 0:
+        if (
+            recording_saving.filters is not None
+            and recording_saving.filters.after_dawndusk_duration != 0
+        ):
             # This filter will only save recordings if the recording time
             # is after dawn or dusk.
             saving_filters.append(
