@@ -2,9 +2,11 @@
 
 ## What is acoupi_batdetect2?
 
-*acoupi_batdetect2* is an open-source Python package that implement the  BatDetect2 [@macodha and al.](https://doi.org/10.1101/2022.12.14.520490) bioacoustics DL model using the [**acoupi**](https://github.com/acoupi) framework. 
+*acoupi_batdetect2* is an open-source Python package that implement the [BatDetect2](https://github.com/macaodha/batdetect2) bioacoustics deep-learning model on edge devices like the RaspberryPi using the [_acoupi_](https://github.com/acoupi) framework. The BatDetect2 DL model has been developed by [Oisin M.A., et al.](https://doi.org/10.1101/2022.12.14.520490) to detect and classify UK bats species. 
 
-The *acoupi_batdetect2*  provides users with a pre-built _acoupi_ program that can be configured and tailored to their use cases of monitoring UK bats species.
+??? Tip "Get familiar with _acoupi_"
+
+    If you are note familiar with [_acoupi_](https://github.com/acoupi), we recommand you first to read the home documentation of _acoupi_. 
 
 ## Requirements
 
@@ -47,22 +49,20 @@ To install *acoupi_batdetect2* on your embedded device follow these steps:
 
     To check what are the available commands for acoupi, enter `acoupi --help`. Also look at the [CLI documentation](reference/cli.md) for further info.
 
-## What is the acoupi framework? 🚀
+## What is acoupi? 🚀
 
-`acoupi` simplifies the use and implementation of open-source AI bioacoustics models.
+_acoupi_ is an open-source Python package that simplifies the use and implementation of bioacoustic classifiers on edge devices. 
+It integrates and standardises the entire bioacoustic monitoring workflow, facilitating the creation of custom sensors, by handling audio recordings, processing, classifications, detections, communication, and data management.
 
 ??? warning "Licenses and Usage"
 
-    Before using a pre-trained AI bioacoustic classifier, review its license to ensure it aligns with your intended use.
-    `acoupi` programs built with these models inherit the corresponding model licenses.
-    For further licensing details, refer to the [FAQ](faq.md#licensing) section.
+    The *acoupi_batdetect2* program inherits the BatDetect2 model license, published under the [_Creative Commons Attribution-NonCommercial 4.0 International_](https://github.com/macaodha/batdetect2?tab=License-1-ov-file#readme). Please make sure to review this license to ensure your intended use complies with its terms.
 
 ??? warning "Model Output Reliability"
 
-    Please note that `acoupi_batdetect2` is not responsible for the accuracy or reliability of the model predictions.
-    It is crucial to understand the performance and limitations of the model before using it in your project.
+    Please note that *acoupi_batdetect2* program is not responsible for the accuracy or reliability of predictions made by the BatDetect2 model. It is essential to understand the model's performance and limitations before using it in your project.
 
-    To learn more about the BatDetect2 model architecture and its precision recall, read the publication [_Towards a General Approach for Bat Echolocation Detection and Classification_ by Oisin M.A., et al., 2022](https://doi.org/10.1101/2022.12.14.520490).
+    For more details on the BatDetect2 model architecture, as well as its precision and recall, refer to the publication [Oisin M.A., et al., (2002) _Towards a General Approach for Bat Echolocation Detection and Classification_](https://doi.org/10.1101/2022.12.14.520490).
 
 ## Next steps 📖
 
@@ -95,6 +95,7 @@ Get to know _acoupi_ better by exploring this documentation.
 
     We would love to hear your feedback about the documentation. We are always looking to hearing suggestions to improve readability and user's ease of navigation. Don't hesitate to reach out if you have comments!
 
+*[AI]: Artificial Intelligence
 *[CLI]: Command Line Interface
 *[DL]: Deep Learning
 *[RPi]: Raspberry Pi

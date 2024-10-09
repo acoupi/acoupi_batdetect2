@@ -23,13 +23,13 @@ class SavingFiltersConfig(BaseModel):
 
     endtime: datetime.time = datetime.time(hour=6, minute=0, second=0)
 
-    before_dawndusk_duration: Optional[int] = 0
+    before_dawndusk_duration: int = 0
 
-    after_dawndusk_duration: Optional[int] = 0
+    after_dawndusk_duration: int = 0
 
-    frequency_duration: Optional[int] = 0
+    frequency_duration: int = 0
 
-    frequency_interval: Optional[int] = 0
+    frequency_interval: int = 0
 
 
 class SavingConfig(BaseModel):
