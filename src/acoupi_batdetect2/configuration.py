@@ -84,7 +84,7 @@ class BatDetect2_ConfigSchema(DetectionProgramConfiguration):
         default_factory=ModelConfig,
     )
 
-    saving: SavingConfig = Field(default_factory=SavingConfig)
+    recording_saving: SavingConfig = Field(default_factory=SavingConfig)
 
     summariser_config: Optional[Summariser] = Field(
         default_factory=Summariser,
