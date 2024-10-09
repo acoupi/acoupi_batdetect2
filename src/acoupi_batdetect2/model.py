@@ -2,11 +2,17 @@
 
 from acoupi import data
 from acoupi.components import types
-from batdetect2 import api
 
 
 class BatDetect2(types.Model):
     """BatDetect2 Model to analyse the audio recording."""
+
+    name: str = "BatDetect2"
+
+    def __init__(self):
+        from batdetect2 import api
+
+        self.api = api
 
     def run(self, recording: data.Recording) -> data.ModelOutput:
         """Run the model on the recording."""
@@ -20,16 +26,16 @@ class BatDetect2(types.Model):
             )
 
         # Load the audio file and compute spectrograms
-        audio = api.load_audio(str(audio_file_path))
-        spec = api.generate_spectrogram(audio)
+        audio = self.api.load_audio(str(audio_file_path))
+        spec = self.api.generate_spectrogram(audio)
 
         # Process the audio or the spectrogram with the model
-        raw_detections, _ = api.process_spectrogram(spec)
+        raw_detections, _ = self.api.process_spectrogram(spec)
 
         # Convert the raw detections to a list of detections
         detections = [
             data.Detection(
-                detection_probability=detection["det_prob"],
+                detection_score=detection["det_prob"],
                 location=data.BoundingBox.from_coordinates(
                     detection["start_time"],
                     detection["low_freq"],
@@ -42,7 +48,7 @@ class BatDetect2(types.Model):
                             key="species",
                             value=detection["class"],
                         ),
-                        classification_probability=detection["class_prob"],
+                        confidence_score=detection["class_prob"],
                     ),
                 ],
             )

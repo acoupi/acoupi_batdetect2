@@ -1,70 +1,60 @@
 """Batdetect2 Program Configuration Options."""
 
 import datetime
-from pathlib import Path
-from typing import Annotated, Optional
+from typing import Optional
 
-from acoupi.components.audio_recorder import MicrophoneConfig
-from acoupi.system.files import TEMP_PATH
-from acoupi.programs.core.base import NoUserPrompt
+from acoupi.programs.templates import (
+    AudioConfiguration,
+    DetectionProgramConfiguration,
+)
 from pydantic import BaseModel, Field
 
-"""Default paramaters for Batdetect2 Program"""
+
+class ModelConfig(BaseModel):
+    """Model output configuration."""
+
+    detection_threshold: float = 0.4
 
 
-class AudioConfig(BaseModel):
-    """Audio recording configuration parameters."""
-
-    audio_duration: int = 3
-    """Duration of each audio recording in seconds."""
-
-    recording_interval: int = 12
-    """Interval between each audio recording in seconds. Need time to run model inference."""
-
-    chunksize: int = 8192
-    """Chunksize of audio recording."""
-
-
-class RecordingSchedule(BaseModel):
-    """Recording schedule config."""
-
-    start_recording: datetime.time = datetime.time(hour=20, minute=0, second=0)
-
-    end_recording: datetime.time = datetime.time(hour=6, minute=0, second=0)
-
-
-class SaveRecordingFilter(BaseModel):
-    """Recording saving options configuration."""
+class SavingFiltersConfig(BaseModel):
+    """Saving Filters for audio recordings configuration."""
 
     starttime: datetime.time = datetime.time(hour=20, minute=0, second=0)
 
     endtime: datetime.time = datetime.time(hour=6, minute=0, second=0)
 
-    saving_threshold: Optional[float] = 0.2
+    before_dawndusk_duration: int = 0
 
-    before_dawndusk_duration: Optional[int] = 0
+    after_dawndusk_duration: int = 0
 
-    after_dawndusk_duration: Optional[int] = 0
+    frequency_duration: int = 0
 
-    frequency_duration: Optional[int] = 0
-
-    frequency_interval: Optional[int] = 0
+    frequency_interval: int = 0
 
 
-class AudioDirectories(BaseModel):
-    """Audio Recording Directories configuration."""
+class SavingConfig(BaseModel):
+    """Saving configuration for audio recordings.
 
-    audio_dir: Path = Path.home() / "storages" / "recordings"
+    (path to storage, name of files, saving threshold).
+    """
 
-    audio_dir_true: Path = Path.home() / "storages" / "recordings" / "bats"
+    true_dir: str = "bats"
 
-    audio_dir_false: Path = Path.home() / "storages" / "recordings" / "no_bats"
+    false_dir: str = "no_bats"
+
+    timeformat: str = "%Y%m%d_%H%M%S"
+
+    saving_threshold: float = 0.2
+
+    filters: Optional[SavingFiltersConfig] = Field(
+        default_factory=SavingFiltersConfig,
+    )
 
 
 class Summariser(BaseModel):
     """Summariser configuration."""
 
-    interval: Optional[float] = 60  # interval in minutes
+    interval: Optional[float] = 3600  # interval in seconds
 
     low_band_threshold: Optional[float] = 0.0
 
@@ -73,81 +63,29 @@ class Summariser(BaseModel):
     high_band_threshold: Optional[float] = 0.0
 
 
-class MQTT_MessageConfig(BaseModel):
-    """MQTT configuration to send messages."""
-
-    host: str = "default_host"
-
-    port: int = 1884
-
-    client_username: str = "guest_username"
-
-    client_password: str = "guest_password"
-
-    topic: str = "mqtt-topic"
-
-    clientid: str = "mqtt-clientid"
-
-
-class HTTP_MessageConfig(BaseModel):
-    """MQTT configuration to send messages."""
-
-    deviceid: str = "device-id"
-
-    baseurl: str = "base-url"
-
-    client_password: str = "guest_password"
-
-    client_id: str = "guest_clientid"
-
-    api_key: str = "guest_apikey"
-
-    content_type: str = "application-json"
-
-
-class BatDetect2_ConfigSchema(BaseModel):
-    """BatDetect2 Configuration Schematic."""
-
-    tmp_path: Annotated[Path, NoUserPrompt] = TEMP_PATH
-
-    name: str = "batdetect2"
-
-    detection_threshold: float = 0.4
-
-    dbpath: Path = Path.home() / "storages" / "acoupi.db"
-
-    dbpath_messages: Path = Path.home() / "storages" / "acoupi_messages.db"
-
-    timeformat: str = "%Y%m%d_%H%M%S"
-
-    timezone: str = "Europe/London"
-
-    microphone_config: MicrophoneConfig
-
-    audio_config: AudioConfig = Field(
-        default_factory=AudioConfig,
+class BatDetect2_AudioConfig(AudioConfiguration):
+    schedule_start: datetime.time = Field(
+        default=datetime.time(hour=18, minute=0, second=0),
     )
 
-    recording_schedule: RecordingSchedule = Field(
-        default_factory=RecordingSchedule,
+    schedule_end: datetime.time = Field(
+        default=datetime.time(hour=6, minute=0, second=0),
     )
 
-    saving_filters: Optional[SaveRecordingFilter] = Field(
-        default_factory=SaveRecordingFilter,
+
+class BatDetect2_ConfigSchema(DetectionProgramConfiguration):
+    """Configuration for the batdetct2 program."""
+
+    recording: AudioConfiguration = Field(
+        default_factory=BatDetect2_AudioConfig,
     )
 
-    audio_directories: AudioDirectories = Field(
-        default_factory=AudioDirectories,
+    model: ModelConfig = Field(
+        default_factory=ModelConfig,
     )
+
+    recording_saving: SavingConfig = Field(default_factory=SavingConfig)
 
     summariser_config: Optional[Summariser] = Field(
         default_factory=Summariser,
     )
-
-    mqtt_message_config: Optional[MQTT_MessageConfig] = Field(
-        default_factory=MQTT_MessageConfig,
-    )
-    http_message_config: Optional[HTTP_MessageConfig] = Field(
-        default_factory=HTTP_MessageConfig,
-    )
-
