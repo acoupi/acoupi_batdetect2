@@ -40,7 +40,9 @@ class BatDetect2_Program(DetectionProgram[BatDetect2_ConfigSchema]):
 
             self.add_task(
                 function=summary_task,
-                schedule=datetime.timedelta(minutes=config.summariser_config.interval),
+                schedule=datetime.timedelta(
+                    minutes=config.summariser_config.interval
+                ),
             )
 
     def configure_model(self, config):
@@ -83,8 +85,10 @@ class BatDetect2_Program(DetectionProgram[BatDetect2_ConfigSchema]):
         return [
             components.SaveRecordingManager(
                 dirpath=config.paths.recordings,
-                dirpath_true=config.paths.recordings / config.recording_saving.true_dir,
-                dirpath_false=config.paths.recordings / config.recording_saving.false_dir,
+                dirpath_true=config.paths.recordings
+                / config.recording_saving.true_dir,
+                dirpath_false=config.paths.recordings
+                / config.recording_saving.false_dir,
                 timeformat=config.recording_saving.timeformat,
                 detection_threshold=config.model.detection_threshold,
                 saving_threshold=config.recording_saving.saving_threshold,
@@ -98,7 +102,9 @@ class BatDetect2_Program(DetectionProgram[BatDetect2_ConfigSchema]):
             )
         ]
 
-    def get_recording_filters(self, config) -> list[types.RecordingSavingFilter]:
+    def get_recording_filters(
+        self, config
+    ) -> list[types.RecordingSavingFilter]:
         if not config.recording_saving:
             # No saving filters defined
             return []

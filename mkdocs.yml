@@ -2,12 +2,21 @@ site_name: acoupi-batdetect2
 site_url: https://acoupi.github.io/acoupi-batdetect2/
 nav:
   - Home: index.md
-  - User Guide:
-      - user_guide/index.md
-      - Installation: user_guide/installation.md
-      - Configuration: user_guide/configuration.md
-      - FAQ: user_guide/faq.md
+  - Tutorials:
+      - tutorials/index.md
+      - Installation: tutorials/installation.md
+      - Configuration: tutorials/configuration.md
+      - Deployment: tutorials/deployment.md
+  - How-To Guides:
+    - howtoguide/index.md
+  - Explanation:
+    - explanation/index.md
   - Reference:
+    - reference/index.md
+    - reference/configuration.md
+    - reference/model.md
+    - reference/programs.md
+  - FAQ: faq.md
   - About the Project:
       - Authors: authors.md
       - License: license.md
@@ -23,7 +32,9 @@ theme:
     - content.code.copy
     - navigation.tracking
     - navigation.indexes
+    - navigation.sections
     - navigation.top
+    - navigation.footer
     - toc.follow
   palette:
     - scheme: default
@@ -35,9 +46,42 @@ theme:
         icon: material/brightness-4
         name: Switch to light mode
 plugins:
+  - mkdocs-video:
+      is_video: True
+      video_muted: True
+      video_controls: True
+      video_autoplay: True
+      video_loop: True
   - search
   - mkdocstrings:
       default_handler: python
+      handlers:
+        python:
+          paths: ["src"]
+          import:
+            - https://docs.python.org/3.11/objects.inv
+            - https://docs.xarray.dev/en/stable/objects.inv
+            - https://numpy.org/doc/stable/objects.inv
+            - https://numpy.org/doc/stable/objects.inv
+            - https://docs.celeryq.dev/en/stable/objects.inv
+          options:
+            show_source: false
+            show_root_toc_entry: true
+            show_symbol_type_toc: true
+            show_root_heading: true
+            show_category_heading: true
+            show_symbol_type_heading: true
+            show_if_no_docstring: true
+            docstring_style: "numpy"
+            docstring_section_style: "table"
+            summary: true
+            signature_crossrefs: true
+            show_signature_annotations: false
+            filters:
+              - "!^_"
+            docstring_options:
+              ignore_init_summary: true
+            merge_init_into_class: true
 markdown_extensions:
   - abbr
   - attr_list
@@ -48,6 +92,8 @@ markdown_extensions:
   - pymdownx.critic
   - pymdownx.keys
   - pymdownx.details
+  - mkdocs-click
+  - md_in_html
   - pymdownx.superfences:
       preserve_tabs: true
       custom_fences:
