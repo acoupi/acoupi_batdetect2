@@ -13,6 +13,8 @@ nav:
     - explanation/index.md
   - Reference:
     - reference/index.md
+    - reference/configuration.md
+    - reference/model.md
     - reference/programs.md
   - FAQ: faq.md
   - About the Project:

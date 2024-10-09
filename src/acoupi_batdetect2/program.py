@@ -83,11 +83,12 @@ class BatDetect2_Program(DetectionProgram[BatDetect2_ConfigSchema]):
         return [
             components.SaveRecordingManager(
                 dirpath=config.paths.recordings,
-                dirpath_true=config.paths.recordings / config.saving.true_dir,
-                dirpath_false=config.paths.recordings / config.saving.false_dir,
-                timeformat=config.saving.timeformat,
+                dirpath_true=config.paths.recordings / config.recording_saving.true_dir,
+                dirpath_false=config.paths.recordings
+                / config.recording_saving.false_dir,
+                timeformat=config.recording_saving.timeformat,
                 detection_threshold=config.model.detection_threshold,
-                saving_threshold=config.saving.saving_threshold,
+                saving_threshold=config.recording_saving.saving_threshold,
             )
         ]
 
