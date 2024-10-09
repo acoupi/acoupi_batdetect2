@@ -64,6 +64,11 @@ It integrates and standardises the entire bioacoustic monitoring workflow, facil
 
     For more details on the BatDetect2 model architecture, as well as its precision and recall, refer to the publication [Oisin M.A., et al., (2002) _Towards a General Approach for Bat Echolocation Detection and Classification_](https://doi.org/10.1101/2022.12.14.520490).
 
+!!! Tip "Available _acoupi_ programs!"
+
+    _acoupi_ offers various programs that can be configured to meet your needs. These programs can be used to simply record audio, send messages, or even detect and classify birds species. Check out the full list of available [_acoupi_ programs](https://github.com/acoupi/faq.md/#technical) to learn more. 
+
+
 ## Next steps 📖
 
 Get to know _acoupi_ better by exploring this documentation.
