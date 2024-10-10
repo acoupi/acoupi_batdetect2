@@ -15,13 +15,9 @@ nav:
     - reference/index.md
     - reference/configuration.md
     - reference/model.md
-    - reference/programs.md
+    - reference/program.md
+    - reference/cli.md
   - FAQ: faq.md
-  - About the Project:
-      - Authors: authors.md
-      - License: license.md
-  - Contributing: contributing.md
-  - Code of Conduct: code_of_conduct.md
 theme:
   name: material
   # logo: assets/logo.svg
@@ -82,6 +78,8 @@ plugins:
             docstring_options:
               ignore_init_summary: true
             merge_init_into_class: true
+extra_css:
+  - css/style.css
 markdown_extensions:
   - abbr
   - attr_list
