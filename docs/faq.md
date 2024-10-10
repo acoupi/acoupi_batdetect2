@@ -20,7 +20,7 @@ acoupi-batdetect2 is itended for researchers, practioners, and individuals inter
 # 
 #### Can I configure acoupi-batdetect2?
 
-Yes. Users can customised the configuration parameters of acoupi-batdetect2 to suit their own needs. See [user_guide/configuration](/docs/user_guide/configuration.md) to learn more about the configuration options.
+Yes. Users can customised the configuration parameters of acoupi-batdetect2 to suit their own needs. See [tutorials/configuration](tutorials/configuration.md) to learn more about the configuration options.
 
 #
 #### What do I need to use acoupi-batdetect2?

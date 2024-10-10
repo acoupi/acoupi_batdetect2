@@ -5,17 +5,38 @@ from acoupi.components import types
 
 
 class BatDetect2(types.Model):
-    """BatDetect2 Model to analyse the audio recording."""
+    """BatDetect2 Model to analyse the audio recording.
+
+    This model uses the BatDetect2 library to detect bat calls in audio
+    recordings and classify them into one of the 18 UK bat species.
+
+    Attributes
+    ----------
+    name : str
+        The name of the model, by default "BatDetect2".
+    """
 
     name: str = "BatDetect2"
 
     def __init__(self):
+        """Initialise the BatDetect2 model."""
         from batdetect2 import api
 
         self.api = api
 
     def run(self, recording: data.Recording) -> data.ModelOutput:
-        """Run the model on the recording."""
+        """Run the model on the recording.
+
+        Parameters
+        ----------
+        recording : data.Recording
+            The audio recording to process.
+
+        Returns
+        -------
+        data.ModelOutput
+            The model output containing the detections.
+        """
         # Get the audio path of the recorded file
         audio_file_path = recording.path
 

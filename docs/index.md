@@ -2,20 +2,19 @@
 
 ## What is acoupi_batdetect2?
 
-*acoupi_batdetect2* is an open-source Python package that implement the [BatDetect2](https://github.com/macaodha/batdetect2) bioacoustics deep-learning model on edge devices like the RaspberryPi using the [_acoupi_](https://github.com/acoupi) framework. The BatDetect2 DL model has been developed by [Oisin M.A., et al.](https://doi.org/10.1101/2022.12.14.520490) to detect and classify UK bats species. 
+*acoupi_batdetect2* is an open-source Python package that implement the [BatDetect2](https://github.com/macaodha/batdetect2) bioacoustics deep-learning model on edge devices like the [Raspberry Pi](https://www.raspberrypi.org/), using the [_acoupi_](https://github.com/acoupi) framework. The BatDetect2 DL model has been developed by [Oisin M.A., et al.](https://doi.org/10.1101/2022.12.14.520490) to detect and classify UK bats species. 
 
 ??? Tip "Get familiar with _acoupi_"
 
-    If you are note familiar with [_acoupi_](https://github.com/acoupi), we recommand you first to read the home documentation of _acoupi_. 
-
+    *acoupi_batdetect2* builds on and inherits features from _acoupi_. If you want to learn more the [_acoupi_](https://github.com/acoupi) framework, we recommand starting with _acoupi's_ home documentation.
 ## Requirements
 
-*acoupi_batdetect2* has been designed to run on single-board computer devices like the [Raspberry Pi](https://www.raspberrypi.org/) (RPi).
-Users should be able to download and test *acoupi_batdetect2* software on any Linux-based machines with Python version >=3.8,<3.12 installed.
+*acoupi_batdetect2* is designed to run on single-board computers like the Raspberry Pi.
+It can be installed and tested on any Linux-based machines with Python version >=3.8,<3.12.
 
-- A Linux-based single board computer such as the Raspberry Pi 4B.
-- A SD Card with 64-bit Lite OS version installed.
-- An ultrasonic USB Microphone such as an [AudioMoth USB Microphone](https://www.openacousticdevices.info/audiomoth) or an Ultramic 192K/250K.
+- A Linux-based single-board computer such as the Raspberry Pi 4B.
+- A SD Card with the 64-bit Lite OS version installed.
+- An ultrasonic USB Microphone, such as an [AudioMoth USB Microphone](https://www.openacousticdevices.info/audiomoth) or an Ultramic 192K/250K.
 
 
 ??? tip "Recommended Hardware"
@@ -66,7 +65,7 @@ It integrates and standardises the entire bioacoustic monitoring workflow, facil
 
 !!! Tip "Available _acoupi_ programs!"
 
-    _acoupi_ offers various programs that can be configured to meet your needs. These programs can be used to simply record audio, send messages, or even detect and classify birds species. Check out the full list of available [_acoupi_ programs](https://github.com/acoupi/faq.md/#technical) to learn more. 
+    _acoupi_ offers various programs that can be configured to meet your needs. These programs can be used to simply record audio, send messages, or even detect and classify birds species. Check out the full list of available [_acoupi_ programs](https://github.com/acoupi/programs.md/#pre-built-programs) to learn more. 
 
 
 ## Next steps 📖
@@ -77,7 +76,7 @@ Get to know _acoupi_ better by exploring this documentation.
     <tr>
         <td>
             <a href="tutorials">Tutorials</a>
-            <p>Step-by-step information on how to install, configure and deploy <i>acoupi</i> for new users.</p>
+            <p>Step-by-step information on how to install, configure and deploy <i>acoupi_batdetect2</i> for new users.</p>
         </td>
         <td>
             <a href="how_to_guide">How-to Guides</a>
