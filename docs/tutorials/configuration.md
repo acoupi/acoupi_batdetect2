@@ -154,6 +154,6 @@ The table below provides detailed information about the parameters available whe
 | `recording_saving.frequency_interval` | int (min.) | 0 | Periodic interval in minutes between two periods of storing recordings. | Set to zero if not using this parameter. |
 | __Summariser (Optional)__| | | Configuration for creating summary messages of the detections. | |
 | `summariser.interval` | float | 3600 | Interval for which detections will be summarised. | In minutes. |
-| `summariser.low_band_threshold` | float | 0.0 | | |
-| `summariser.mid_band_threshold` | float | 0.0 | | |
-| `summariser.high_band_threshold` | float | 0.0 | | |
+| `summariser.low_band_threshold` | float | 0.0 | Count the number of bat calls for each species that have a classification score lower or equal to the threshold. | A float value between 0.01 and 0.99 |
+| `summariser.mid_band_threshold` | float | 0.0 | Count the number of bat calls for each species that have a classification score lower or equal to the mid_band value but higher than the low_band value. | A float value between 0.01 and 0.99 |
+| `summariser.high_band_threshold` | float | 0.0 | Count the number of bat calls for each species that have a classification score lower or equal to the high_band value but higher than the high_band value. | A float value between 0.01 and 0.99 |
