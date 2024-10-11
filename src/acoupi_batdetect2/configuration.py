@@ -76,7 +76,7 @@ class BatDetect2_AudioConfig(AudioConfiguration):
 class BatDetect2_ConfigSchema(DetectionProgramConfiguration):
     """Configuration for the batdetct2 program."""
 
-    recording: AudioConfiguration = Field(
+    recording: BatDetect2_AudioConfig = Field(  # type: ignore
         default_factory=BatDetect2_AudioConfig,
     )
 
