@@ -1,14 +1,11 @@
 """Common testing fixtures."""
 
 import datetime
-from os.path import exists
 from pathlib import Path
 
-import pyaudio
 import pytest
-from acoupi import components, data
-from acoupi.components import HTTPConfig, MicrophoneConfig, MQTTConfig
-from acoupi.devices.audio import get_input_devices
+from acoupi import data
+from acoupi.components import HTTPConfig, MicrophoneConfig
 from acoupi.programs.templates import (
     AudioConfiguration,
     MessagingConfig,
@@ -17,7 +14,6 @@ from acoupi.programs.templates import (
 from acoupi.system.constants import CeleryConfig
 from celery import Celery
 from celery.worker import WorkController
-from torch import true_divide
 
 from acoupi_batdetect2.configuration import (
     BatDetect2_ConfigSchema,
@@ -114,7 +110,7 @@ def program_config(
         messaging=messaging_config,
         recording=audio_config,
         microphone=microphone_config,
-        saving=SavingConfig(
+        recording_saving=SavingConfig(
             filters=None,
         ),
     )
