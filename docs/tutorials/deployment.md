@@ -49,11 +49,7 @@ When ready to start a program, use the `acoupi deployment start` command. This w
 
 ### Getting the status of a deployment
 
-After starting a deployment, it’s good practice to check the status of the program by running the `acoupi deployment status` command. This command can show the following outputs: 
-
-- _`active (running)`_ in green meaning that everything is working well
-- _`inactive (dead)`_ colourless meaning that the program is not running. Run the start command to active it. 
-- _`failed (Result: exit-code)`_ in red meanting that there is an error with running the program. Read the error messages to troubleshoot the issue. 
+After starting a deployment, it’s good practice to check the status of the program by running the `acoupi deployment status` command. This command provides a status report for system services, Celery workers, the program, and the overall deployment.
 
 !!! Example "CLI Command: viewing the status of *acoupi_batdetect2*"
 

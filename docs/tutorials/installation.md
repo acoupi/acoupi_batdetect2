@@ -22,17 +22,26 @@ We recommend the following hardware elements to install and run _acoupi_.
 
     If you are new to RPi, we recommend you reading and following the RPi's [**Getting started**](https://www.raspberrypi.com/documentation/computers/getting-started.html) documentation.
 
-To install and use *acoupi_batdetect" on your embedded device follow these steps:
+To install and use _acoupi_batdetect_ on your embedded device follow these steps:
 
-**Step 1:** Install *acoupi_batdetect2* and its dependencies.
+**Step 1:** Install _acoupi_ and its dependencies.
 
-!!! Example "CLI Command: install *acoupi_batdetect2*"
+!!! Example "CLI Command: install _acoupi_"
 
     ```bash
     curl -sSL https://github.com/acoupi_batdetect2/install_script.sh | bash
     ```
 
-**Step 2:** Configure the *acoupi_batdetect2* program.
+**Step 2:** Install _acoupi_batdetect2_.
+
+!!! Example "CLI Command: install _acoupi_batdetect2_"
+
+    ```bash
+    pip install acoupi_batdetect2
+    ```
+
+
+**Step 3:** Configure the *acoupi_batdetect2* program.
 
 *acoupi_batdetect2* program includes multiple components for recording, processing, saving and deleting audio files, as well as sending detections and summary messages to a remote server. Enter the following command to configure the program according to your needs.
 
@@ -42,7 +51,7 @@ To install and use *acoupi_batdetect" on your embedded device follow these steps
     acoupi setup --program acoupi_batdetect2.program
     ```
 
-**Step 3:** To start a deployment of *acoupi_batdetect*, run the command:
+**Step 4:** To start a deployment of *acoupi_batdetect*, run the command:
 
 !!! Example "CLI Command: start the configured *acoupi_batdetect* program"
 
@@ -52,4 +61,4 @@ To install and use *acoupi_batdetect" on your embedded device follow these steps
 
 ??? tip "Using _acoupi_ from the command line"
 
-    To check what are the available commands for _acoupi_, enter `acoupi --help`. Also look at the [CLI documentation](../reference/cli.md) for further info.
+    To check what are the available commands for _acoupi_, enter `acoupi --help`. Also look at the [CLI documentation](http://pypi/acopui.com) for further info.

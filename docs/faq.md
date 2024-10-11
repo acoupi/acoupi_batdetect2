@@ -1,35 +1,31 @@
-# Acoupi-BatDetect2 FAQ
+# FAQ
 
-#### What is acoupi-batdetect2? 
+## What is acoupi-batdetect2? 
 **acoupi-batdetect2** is the implementation of the AI Bioacoustics Classifier [BatDetect2](https://github.com/macaodha/batdetect2/tree/main) using acoupi Python toolkit. 
 
-#
-#### What is BatDetect2? 
+## What is BatDetect2? 
 **BatDetect2** is a deep-learning model to detect and classify bat echolocation calls in high frequency audio recordings. 
 
 The model was developed by Santiago Martinez Balvanera ([@mbsantiago](https://github.com/mbsantiago)) and Oisin Mac Adoha ([@macaodha](https://github.com/macaodha)). 
 
-#
-#### Can the BatDetect2 model classify any bat species? 
+## Can the BatDetect2 model classify any bat species? 
 No, the BatDetect2 model was developed for UK bat species. When using the model to classifiy bat species not found in the UK, you will most probably get misclassification. 
 
-#
-#### For who is acoupi-batdetect2? 
-acoupi-batdetect2 is itended for researchers, practioners, and individuals interested in recording and classifying UK bat species. 
+## For who is _acoupi_batdetect2_? 
+_acoupi_batdetect2_ is itended for researchers, practioners, and individuals interested in recording and classifying UK bat species. 
 
-# 
-#### Can I configure acoupi-batdetect2?
+## Can I configure _acoupi_batdetect2_?
 
 Yes. Users can customised the configuration parameters of acoupi-batdetect2 to suit their own needs. See [tutorials/configuration](tutorials/configuration.md) to learn more about the configuration options.
 
-#
-#### What do I need to use acoupi-batdetect2?
+## What are the requirements to use _acoupi_batdetect2_?
 To use acoupi-batdetect2 you will need the following hardware:
+
  - a Raspberry Pi 4
  - an SD Card (32GB or 64GB) with RaspbiOS-Arm64-Lite installed. 
  - a USB microphone being able to record high-frequencies such as the [AudioMoth](https://www.openacousticdevices.info/audiomoth) or the [Ultramic](https://www.dodotronic.com/product/ultramic-um192k/) from Dodotronic. 
-#
-#### Where can I found more information about BatDetect2? 
+
+## Where can I found more information about BatDetect2? 
 
 1. The [BatDetect2 GitHub repository](https://github.com/macaodha/batdetect2/tree/main) contains a lot of information about the model. You may also want to check the [PyPi documentation](https://pypi.org/project/batdetect2/). 
 

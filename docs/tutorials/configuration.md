@@ -83,7 +83,7 @@ _batdetect2_ program via the CLI.
     recorder location, and environmenal conditions. 
 
     We recommend familiarising yourself with the BatDetect2 model's precision and recall values for each of the UK bat species. Refer to the 
-    publication by [Oisin M.A., et al., (2002) _Towards a General Approach for Bat Echolocation Detection and Classification_](https://doi.org/10.1101/2022.12.14.520490) for more details. 
+    publication by [Mac Aodha O., et al., (2002) _Towards a General Approach for Bat Echolocation Detection and Classification_](https://doi.org/10.1101/2022.12.14.520490) for more details. 
 
 ??? Tip "How to modify a value after setup?"
     
