@@ -7,16 +7,14 @@ nav:
       - Installation: tutorials/installation.md
       - Configuration: tutorials/configuration.md
       - Deployment: tutorials/deployment.md
-  - How-To Guides:
-    - howtoguide/index.md
   - Explanation:
     - explanation/index.md
+    - explanation/batdetect2_program.md
   - Reference:
     - reference/index.md
     - reference/configuration.md
     - reference/model.md
     - reference/program.md
-    - reference/cli.md
   - FAQ: faq.md
 theme:
   name: material
