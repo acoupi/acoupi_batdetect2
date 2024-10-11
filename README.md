@@ -1,8 +1,6 @@
 # acoupi_batdetect2
 An acoupi-compatible BatDetect2 model and program
 
-# acoupi_batdetect2
-
 > [!TIP]
 > Read the latest [documentation](https://acoupi.github.io/acoupi_batdetect2/)
 
