@@ -18,7 +18,7 @@ After installing and configuring an *acoupi_batdetect2* program, users can proce
 
 The video shows how a user can start, stop, and get the status of *acoupi_batdetect2*.
 
-![type:video](ADD LINK){: style='width: 100%'}
+![type:video](../img/acoupi_deployment.mp4){: style='width: 100%'}
 
 ### Before starting a deployment
 
@@ -70,3 +70,23 @@ Stopping the deployment can be necessary if you need to modify the program’s c
     ```bash
     acoupi deployment stop
     ```
+## Understanding _acoupi_ status
+
+- __System Services__: Refer to the background processes that keep your acoupi installation running. These are the core services that manage the overall execution of the program and heartbeat monitoring. Two critical files handle these: the `acoupi.service` responsible for starting and stopping the program and the `acoupi-beat.service` that ensure the system's health at regular interval (hearbeats).
+
+    - `status: inactive`: the system services are not running. This happen when the program has not been deployed.
+    - `status: active`: the system services are running normally.
+    - `status: failed`: an error has occured, and the services have stopped. The error message will provide information about the error.
+
+- __Celery__: Celery is the task manager that coordinates the execution of background jobs, indlucing tasks like audio recording and file management. By default, _acoupi_ uses two workers: the `recording` worker manages audio recording tasks, the `default` worker handles any other tasks.  
+    - `status: unavailable`: Celery hasn't started or has stopped. The program isn't processing tasks. 
+    - `status: available` and `workers: ok` : Celery is up and running, with workers active and processing tasks normally. 
+    - `status: available` and `workers: notok` : Celery is up and running, but one or both workers are encountering problems or is not available. Check the log to identify the issue. 
+
+- __Program__: Refer to the configuration and execution of the _acoupi_ program. 
+    - `status: ok` : the program has been configured correctly, and no issues have been detected. 
+    - `status: unhealthy` : there is an issue with the configuration of the program. This suggests that you might need to review the program's configuration setup.  
+
+- __Deployment__: Refer to the overall state of your active _acoupi_ instance, indicating whether everything is currently running as expected.
+    - `status: active`: the deployment is running successfuly, the program is active and tasks are being executed.
+    - `status: inactive`: the deployment has stopped or hasn't been started.

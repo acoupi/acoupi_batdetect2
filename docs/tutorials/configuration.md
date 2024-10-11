@@ -8,6 +8,8 @@ To **reject and modify** a setting, press the keyboard letter `n` and input a ne
 The video shows the configuration process for the _acoupi 
 _batdetect2_ program via the CLI.  
 
+![type:video](../img/acoupi_configuration.mp4){: style='width: 100%'}
+
 ### Configuration Parameters
 
 !!! Example "CLI Output: _acoupi config get_"
