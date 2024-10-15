@@ -70,7 +70,7 @@ class BatDetect2_ConfigSchema(cProfileProgram_Configuration):
     )
 
 
-class BatDetect2_Program(cProfileProgram):
+class BatDetect2_Program(cProfileProgram[BatDetect2_ConfigSchema]):
 
     config_schema = BatDetect2_ConfigSchema
 
