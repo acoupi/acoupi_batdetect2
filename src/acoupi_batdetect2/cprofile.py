@@ -1,8 +1,6 @@
 import datetime
-from typing import Optional
 
-import pytz
-from acoupi import components, data, tasks
+from acoupi import components
 from acoupi.components import types
 from acoupi.programs.templates import (
     AudioConfiguration,
