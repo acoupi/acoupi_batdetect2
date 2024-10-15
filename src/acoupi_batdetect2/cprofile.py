@@ -27,6 +27,15 @@ class AudioConfig(AudioConfiguration):
     )
 
 
+class SaveRecordingManager(BaseModel):
+    """Configruation options to manage saving recordings."""
+
+    true_dir: str = "true_detections"
+    false_dir: str = "false_detections"
+    timeformat: str = "%Y%m%d_%H%M%S"
+    saving_threshold: float = 0.2
+
+
 class ModelConfig(BaseModel):
     """Model configuration schema."""
 
@@ -40,6 +49,9 @@ class BatDetect2_ConfigSchema(cProfileProgram_Configuration):
     )
     model: ModelConfig = Field(
         default_factory=ModelConfig,
+    )
+    saving_managers: SaveRecordingManager = Field(
+        default_factory=SaveRecordingManager,
     )
 
 
@@ -57,5 +69,20 @@ class BatDetect2_Program(cProfileProgram[BatDetect2_ConfigSchema]):
         return [
             components.DetectionThresholdMessageBuilder(
                 detection_threshold=config.model.detection_threshold
+            )
+        ]
+
+    def get_recording_saving_managers(self, config):
+        if not config.saving_managers:
+            return []
+        return [
+            components.SaveRecordingManager(
+                dirpath=config.paths.recordings,
+                dirpath_true=config.paths.recordings / config.saving_managers.true_dir,
+                dirpath_false=config.paths.recordings
+                / config.saving_managers.false_dir,
+                timeformat=config.saving_managers.timeformat,
+                detection_threshold=config.model.detection_threshold,
+                saving_threshold=config.saving_managers.saving_threshold,
             )
         ]
