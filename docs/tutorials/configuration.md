@@ -1,16 +1,29 @@
 # Configuration
 
-Once *acoupi_batdetect2* has been installed on a device, users can configure it.
+Once *acoupi_batdetect2* has been installed on a device, users can configure it. This setup determine how the device records audio, classifies it, and sends information over a network.
 
-To **accept** the default values, press the keyboard letter `y` or the key `Enter`. 
-To **reject and modify** a setting, press the keyboard letter `n` and input a new value.
+To **accept** the default settings, press the keyboard letter __`y`__ or the key __`Enter__`__. 
+To **reject and modify** a setting, press the keyboard letter __`n`__ and input a new value when prompted.
 
-The video shows the configuration process for the _acoupi 
-_batdetect2_ program via the CLI.  
+The video shows the configuration process for the _acoupi_batdetect2_ program via the CLI.  
 
 ![type:video](../img/acoupi_configuration.mp4){: style='width: 100%'}
 
 ### Configuration Parameters
+
+The following is an example of how an _acoupi_batdetect2_ program can be configured, shown in JSON format. 
+
+In this setup, the device records audio in 3 second clips every 12 seconds, from 7pm to 7am. However, the device only save recordings between 9pm and 11pm. Several parameters control how and when recordings are saved. 
+
+- __`recording_saving.true_dir`__ and __`recording_saving.false_dir`__ specify the folders where recordings are saved. These paramenters are complementary to the __`paths.recordings`__ parameter. Recording with "true" detections (i.e., where the detection confidence score is greater or equal to the __`model.detection_threshold`__ parameter) are saved in the `true_dir` folder, while those with "false" detections (i.e., where the confidence score is lower than the __`model.detection_threshold`__ but higher than the __`recording_saving.saving_threshold`__) are saved in the `false_dir` folder. This aims at helping capturing possible __false negatives__. 
+- __`recording_saving.timeformat`__ determines the naming format for saved recordings. The timestamp in the filename reflects the starting time of a recording (i.e., the exact time the recording started).
+
+
+Detections made by the BatDetect2 model are transmitted to a remote server using the MQTT communication protocol. The following aprameters manage how and where this information is sent. 
+
+- __`mqtt.host`__ and __`mqtt.topic`__ specify the destination (i.e., the server address and the topic) to which messages are sent. Messages contain information about the recording file, and the detection and classification found in the file. 
+- __`messaging.messages_db`__ sets the location of the local database on the device. This database stores outgoing messages and tracks their status - whether they are waiting to be sent, have been sent successfully or failed. 
+- __`messaging.message_send_interval`__ controls how often the system checks for new messages to be sent. This interval can be reduced for near real-time updates, or lengthen to minutes or even hours if network connectivity is limited. 
 
 !!! Example "CLI Output: _acoupi config get_"
 

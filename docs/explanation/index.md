@@ -6,7 +6,7 @@ This section of the documentation is intended for users who wish to better under
 
 !!! Tip "Learn about _acoupi_ LEGO blocks!"
 
-    If you are interested in learning move about the different building blocks forming the _acoupi_ framework, please refer to the [_Explanation Section_ of _acoupi_](https://github.com/acoupi).  
+    If you are interested in learning move about the different building blocks forming the _acoupi_ framework, please refer to the [_Explanation Section_](https://acoupi.github.io/acoupi/explanation/architecture/) of _acoupi_ documentation.  
 
 !!! info "_acoupi_ Reference"
 

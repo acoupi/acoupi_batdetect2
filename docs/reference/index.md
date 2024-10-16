@@ -12,7 +12,7 @@ and the program itself.
 
 !!! Tip "Learn more about program tasks and compoments:"
 
-    The elements of the _acoupi_batdetect2_ program build and inherit from [_acoupi_](https://github.com/acoupi) package. For detailed information on each module, class, and method, refer to the _acoupi_ documentation's reference section.
+    The elements of the _acoupi_batdetect2_ program build and inherit from [_acoupi_](https://acoupi.github.io/acoupi/reference) package. For detailed information on each module, class, and method, refer to the _acoupi_ documentation's reference section.
 
 <table>
   <tr>

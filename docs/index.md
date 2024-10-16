@@ -2,15 +2,15 @@
 
 ## What is acoupi_batdetect2?
 
-*acoupi_batdetect2* is an open-source Python package that implement the [BatDetect2](https://github.com/macaodha/batdetect2) bioacoustics deep-learning model on edge devices like the [Raspberry Pi](https://www.raspberrypi.org/), using the [_acoupi_](https://github.com/acoupi) framework. The BatDetect2 DL model has been developed by [Mac Aodha O., et al.](https://doi.org/10.1101/2022.12.14.520490) to detect and classify UK bats species. 
+*acoupi_batdetect2* is an open-source Python package that implement the [BatDetect2](https://github.com/macaodha/batdetect2) bioacoustics deep-learning model on edge devices like the [Raspberry Pi](https://www.raspberrypi.org/), using the [_acoupi_](https://acoupi.github.io/acoupi) framework. The BatDetect2 DL model has been developed by [Mac Aodha O., et al.](https://doi.org/10.1101/2022.12.14.520490) to detect and classify UK bats species. 
 
 !!! Warning "What is the difference between _acoupi_ and _acoupi_batdetect2_?"
 
-    __acoupi_batdetect2__ and [___acoupi___](https://github.com/acoupi) are different. The __acoupi_batdetect2__ program is built on top of the ___acoupi___ python package. Think of ___acoupi___ like a bag of LEGO pieces that you can assemble into multiple shapes and forms. __acoupi_batdectect2__ would be the results of assembling some of these LEGO pieces into a "bat"!
+    __acoupi_batdetect2__ and [___acoupi___](https://acoupi.github.io/acoupi) are different. The __acoupi_batdetect2__ program is built on top of the ___acoupi___ python package. Think of ___acoupi___ like a bag of LEGO pieces that you can assemble into multiple shapes and forms. __acoupi_batdectect2__ would be the results of assembling some of these LEGO pieces into a "bat"!
 
 ??? Tip "Get familiar with _acoupi_"
 
-    *acoupi_batdetect2* builds on and inherits features from _acoupi_. If you want to learn more the [_acoupi_](https://github.com/acoupi) framework, we recommand starting with _acoupi's_ home documentation. 
+    *acoupi_batdetect2* builds on and inherits features from _acoupi_. If you want to learn more the [_acoupi_](https://acoupi.github.io/acoupi) framework, we recommand starting with _acoupi's_ home documentation. 
 
 ## Requirements
 
@@ -34,7 +34,7 @@ To install *acoupi_batdetect2* on your embedded device, you will need to first h
 !!! Example "Step1: Install _acoupi_ and its dependencies"
 
     ```bash
-    curl link to acoupi bash
+    curl -sSL https://github.com/acoupi/acoupi/raw/main/scripts/setup.sh | bash
     ```
 
 !!! Example "Step2: Install *acoupi_batdetect2* and its dependencies"
@@ -55,9 +55,9 @@ To install *acoupi_batdetect2* on your embedded device, you will need to first h
     acoupi deployment start
     ```
 
-??? tip "Using acoupi from the command line"
+??? tip "Using _acoupi_batdetect2_ from the command line"
 
-    To check what are the available commands for acoupi, enter `acoupi --help`. Also look at the [CLI documentation](reference/cli.md) for further info.
+    To check what are the available commands for _acoupi_batdetect2_, enter `acoupi --help`. For more details about each of the commands, refer to the _acoupi_ [CLI documentation](https://acoupi.github.io/acoupi/reference/cli/) for further info.
 
 ## What is acoupi? 🚀
 
@@ -78,7 +78,7 @@ It integrates and standardises the entire bioacoustic monitoring workflow, facil
 
 !!! Tip "Available _acoupi_ programs!"
 
-    _acoupi_ offers various programs that can be configured to meet your needs. These programs can be used to simply record audio, send messages, or even detect and classify birds species. Check out the full list of available [_acoupi_ programs](https://github.com/acoupi/programs.md/#pre-built-programs) to learn more. 
+    _acoupi_ offers various programs that can be configured to meet your needs. These programs can be used to simply record audio, send messages, or even detect and classify birds species. Check out the full list of available [_acoupi_ programs](https://acoupi.github.io/acoupi/explanation/programs/#pre-built_programs) to learn more. 
 
 
 ## Next steps 📖
@@ -91,16 +91,14 @@ Get to know _acoupi_ better by exploring this documentation.
             <a href="tutorials">Tutorials</a>
             <p>Step-by-step information on how to install, configure and deploy <i>acoupi_batdetect2</i> for new users.</p>
         </td>
-        <td>
-            <a href="how_to_guide">How-to Guides</a>
-            <p>Guides to learn how to customise and built key elements of <i>acoupi</i>.</p>
-        </td>
     </tr>
     <tr>
         <td>
             <a href="explanation">Explanation</a>
-            <p>Learning about the <i>acoupi</i> framework.</p>
+            <p>Learn more about the building blocks constituing <i>acoupi_batdetect2</i> program.</p>
         </td>
+    </tr>
+    <tr>
         <td>
             <a href="reference">Reference</a>
             <p>Technical information refering to <i>acoupi_batdetect2</i> code.</p>

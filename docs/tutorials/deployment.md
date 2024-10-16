@@ -11,10 +11,10 @@ After installing and configuring an *acoupi_batdetect2* program, users can proce
 
 ??? tip "How are deployments managed?"
 
-    For more details about the system background processes and the management of a deployment, refer to the [_Explanation: System_(ADD Link to acoupi pypi docs) section of the _acoupi_ documentation.
+    For more details about the system background processes and the management of a deployment, refer to the [_Explanation: System_](https://acoupi.github.io/acoupi/explanation/system/) section of the _acoupi_ documentation.
 
 
-## Managing the deployment of *acoupi_batdetect2* program via the CLI
+## Managing the deployment of *acoupi_batdetect2* via the CLI
 
 The video shows how a user can start, stop, and get the status of *acoupi_batdetect2*.
 
@@ -66,7 +66,7 @@ Stopping the deployment can be necessary if you need to modify the program’s c
     ```bash
     acoupi deployment stop
     ```
-## Understanding _acoupi_ status
+## Understanding _acoupi_batdetect2_ status
 
 - __System Services__: Refer to the background processes that keep your acoupi installation running. These are the core services that manage the overall execution of the program and heartbeat monitoring. Two critical files handle these: the `acoupi.service` responsible for starting and stopping the program and the `acoupi-beat.service` that ensure the system's health at regular interval (hearbeats).
 
