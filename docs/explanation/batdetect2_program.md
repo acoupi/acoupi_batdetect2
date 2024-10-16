@@ -1,7 +1,6 @@
 # Batdetect2 Program
 
-The BatDetect2 Program  to record, detect and classify, as well as
-manage and send messages of UK bat calls. The program extends the `DetectionProgram` and `MessagingProgram` from the _acoupi_ package by adding the BatDetect2 model and integrating users' custom configuration schema.
+The BatDetect2 Program has been designed to record, detect and classify, as well as manage and send messages of UK bat calls. The program extends the `DetectionProgram` and `MessagingProgram` from the _acoupi_ package by adding the BatDetect2 model and integrating users' custom configuration schema.
 
 ### Key Elements
 
