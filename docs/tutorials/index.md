@@ -1,7 +1,7 @@
 # Tutorials
 
 This section of the documentation contains step-by-step tutorials to help you getting started with _acoupi_batdetect2_.
-The tutorials aims to outline what _acoupi_batdetect2_ is capable of while providing specific information such as installing, configuring, and deploying the _acoupi_batdetect2_ program.
+The tutorials aim to outline what _acoupi_batdetect2_ is capable of while providing specific information such as installing, configuring, and deploying the _acoupi_batdetect2_ program.
 
 We hope the tutorials are broadly accessible to anyone with an interest in using _acoupi_batdetect2_.
 

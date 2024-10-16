@@ -1,6 +1,6 @@
 # FAQ
 
-## What is acoupi-batdetect2? 
+## What is *acoupi-batdetect2*? 
 **acoupi-batdetect2** is the implementation of the AI Bioacoustics Classifier [BatDetect2](https://github.com/macaodha/batdetect2/tree/main) using acoupi Python toolkit. 
 
 ## What is BatDetect2? 
@@ -16,10 +16,10 @@ _acoupi_batdetect2_ is itended for researchers, practioners, and individuals int
 
 ## Can I configure _acoupi_batdetect2_?
 
-Yes. Users can customised the configuration parameters of acoupi-batdetect2 to suit their own needs. See [tutorials/configuration](tutorials/configuration.md) to learn more about the configuration options.
+Yes. Users can customised the configuration parameters of _acoupi-batdetect2_ to suit their own needs. See [tutorials/configuration](tutorials/configuration.md) to learn more about the configuration options.
 
 ## What are the requirements to use _acoupi_batdetect2_?
-To use acoupi-batdetect2 you will need the following hardware:
+To use _acoupi-batdetect2_ you will need the following hardware:
 
  - a Raspberry Pi 4
  - an SD Card (32GB or 64GB) with RaspbiOS-Arm64-Lite installed. 
