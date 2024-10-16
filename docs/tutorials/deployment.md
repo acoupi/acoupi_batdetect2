@@ -61,7 +61,7 @@ After starting a deployment, it’s good practice to check the status of the pro
 
 Stopping the deployment can be necessary if you need to modify the program’s configuration, move the device to a different location, or fix any errors that have appeared in the logs. To halt the program, use the `acoupi deployment stop` command. Remember, once a deployment is stopped, it can only be restarted by running the acoupi deployment start command again.
 
-!!! Example "CLI Command: halting an acoupi program"
+!!! Example "CLI Command: halting deployment of *acoupi_batdetect2*"
 
     ```bash
     acoupi deployment stop
