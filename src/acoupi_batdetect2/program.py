@@ -33,7 +33,7 @@ configured protocol (HTTP or MQTT).
 BatDetect2 model. Detections with a confidence score below this threshold 
 will be excluded from the store and from the message content.
 
-- __SavingConfig__: Define where recordings are stored, the naming format, and 
+- __SaveRecordingManager__: Define where recordings are stored, the naming format, and 
 the minimum confidence score for saving recordings. Recordings with confidence 
 scores below the `saving_threshold` will not be saved. The `saving_threshold` 
 can be set lower than the `detection_threshold` to save recordings with uncertain 
@@ -42,7 +42,7 @@ saved in the `true_dir` directory, while recordings with detections below
 the `detection_threshold` but above the `saving_threshold` will be saved in 
 the `false_dir` directory. 
 
-- __SavingFiltersConfig__: Define additional saving filters for saving recordings. 
+- __SaveRecordingFilter__: Define additional saving filters for saving recordings. 
     1. A timeinterval interval fitler that saves recordings whthin a specific time
      window, set by the `starttime` and `endtime` parameters. 
     2. A frequency filter that saves recordings for a specific duration
