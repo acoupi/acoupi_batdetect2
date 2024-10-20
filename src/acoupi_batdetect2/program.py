@@ -179,12 +179,12 @@ class BatDetect2_Program(DetectionProgram[BatDetect2_ConfigSchema]):
         return [
             components.SaveRecordingManager(
                 dirpath=config.paths.recordings,
-                dirpath_true=config.paths.recordings / config.recording_saving.true_dir,
+                dirpath_true=config.paths.recordings / config.saving_managers.true_dir,
                 dirpath_false=config.paths.recordings
-                / config.recording_saving.false_dir,
-                timeformat=config.recording_saving.timeformat,
+                / config.saving_managers.false_dir,
+                timeformat=config.saving_managers.timeformat,
                 detection_threshold=config.model.detection_threshold,
-                saving_threshold=config.recording_saving.saving_threshold,
+                saving_threshold=config.saving_managers.saving_threshold,
             )
         ]
 
@@ -225,13 +225,13 @@ class BatDetect2_Program(DetectionProgram[BatDetect2_ConfigSchema]):
             A list of recording filters for the batdetect2 program. If no
             saving filters are defined, the method will not save any recordings.
         """
-        if not config.recording_saving:
+        if not config.saving_filters:
             # No saving filters defined
             return []
 
         saving_filters = []
         timezone = pytz.timezone(config.timezone)
-        recording_saving = config.recording_saving
+        recording_saving = config.saving_filters
 
         # Main filter
         # Will only save recordings if the recording time is in the

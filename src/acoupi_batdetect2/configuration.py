@@ -10,6 +10,20 @@ from acoupi.programs.templates import (
 from pydantic import BaseModel, Field
 
 
+class BatDetect2_AudioConfig(AudioConfiguration):
+    """Audio Configuration schema."""
+
+    schedule_start: datetime.time = Field(
+        default=datetime.time(hour=19, minute=0, second=0),
+    )
+    """Start time for recording schedule."""
+
+    schedule_end: datetime.time = Field(
+        default=datetime.time(hour=7, minute=0, second=0),
+    )
+    """End time for recording schedule."""
+
+
 class ModelConfig(BaseModel):
     """Model output configuration."""
 
@@ -17,7 +31,7 @@ class ModelConfig(BaseModel):
     """Detection threshold for filtering model outputs."""
 
 
-class SavingFiltersConfig(BaseModel):
+class SaveRecordingFilter(BaseModel):
     """Saving Filters for audio recordings configuration."""
 
     starttime: datetime.time = datetime.time(hour=19, minute=0, second=0)
@@ -39,7 +53,7 @@ class SavingFiltersConfig(BaseModel):
     """Optional periodic interval in minutes to save recordings."""
 
 
-class SavingConfig(BaseModel):
+class SaveRecordingManager(BaseModel):
     """Saving configuration for audio recordings.
 
     (path to storage, name of files, saving threshold).
@@ -56,11 +70,6 @@ class SavingConfig(BaseModel):
 
     saving_threshold: float = 0.2
     """Minimum threshold of detections from a recording to save it."""
-
-    filters: Optional[SavingFiltersConfig] = Field(
-        default_factory=SavingFiltersConfig,
-    )
-    """Additional filters for saving recordings."""
 
 
 class Summariser(BaseModel):
@@ -79,20 +88,6 @@ class Summariser(BaseModel):
     """Optional high band threshold to summarise detections."""
 
 
-class BatDetect2_AudioConfig(AudioConfiguration):
-    """Audio Configuration schema."""
-
-    schedule_start: datetime.time = Field(
-        default=datetime.time(hour=21, minute=0, second=0),
-    )
-    """Start time for recording schedule."""
-
-    schedule_end: datetime.time = Field(
-        default=datetime.time(hour=23, minute=0, second=0),
-    )
-    """End time for recording schedule."""
-
-
 class BatDetect2_ConfigSchema(DetectionProgramConfiguration):
     """BatDetect2 Program Configuration schema.
 
@@ -101,7 +96,7 @@ class BatDetect2_ConfigSchema(DetectionProgramConfiguration):
     model setup, file management, messaging, and summarisation.
     """
 
-    recording: AudioConfiguration = Field(
+    recording: BatDetect2_AudioConfig = Field(
         default_factory=BatDetect2_AudioConfig,
     )
     """Audio recording configuration."""
@@ -111,8 +106,15 @@ class BatDetect2_ConfigSchema(DetectionProgramConfiguration):
     )
     """Model output configuration."""
 
-    recording_saving: SavingConfig = Field(default_factory=SavingConfig)
-    """Saving configuration for audio recordings."""
+    saving_filters: SaveRecordingFilter = Field(
+        default_factory=SaveRecordingFilter,
+    )
+    """Recording Saving Filters configuration for audio recordings."""
+
+    saving_managers: SaveRecordingManager = Field(
+        default_factory=SaveRecordingManager,
+    )
+    """Recording Saving Managers configuration for audio recordings."""
 
     summariser_config: Optional[Summariser] = Field(
         default_factory=Summariser,
