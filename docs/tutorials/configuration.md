@@ -1,25 +1,25 @@
 # Configuration
 
-Once *acoupi_batdetect2* has been installed on a device, users can configure it. This setup determine how the device records audio, classifies it, and sends information over a network.
+Once *acoupi_batdetect2* has been installed on a device, users can configure it. This setup determines how the device records audio, classifies it, and sends information over a network.
 
 To **accept** the default settings, press the keyboard letter __`y`__ or the key __`Enter`__. 
 To **reject and modify** a setting, press the keyboard letter __`n`__ and input a new value when prompted.
 
-The video shows the configuration process for the _acoupi_batdetect2_ program via the CLI.  
+The video shows the configuration process for the _acoupi_batdetect2_ program via the CLI.
 
 ![type:video](../img/acoupi_configuration.mp4){: style='width: 100%'}
 
 ### Configuration Parameters
 
-The following is an example of how an _acoupi_batdetect2_ program can be configured, shown in JSON format. 
+The following is an example of how an _acoupi_batdetect2_ program can be configured, shown in JSON format.
 
-In this setup, the device records audio in 3 second clips every 12 seconds, from 7pm to 7am. However, the device only save recordings between 9pm and 11pm. Several parameters control how and when recordings are saved. 
+In this setup, the device records audio in 3 second clips every 12 seconds, from 7pm to 7am. However, the device only saves recordings between 9pm and 11pm. Several parameters control how and when recordings are saved. 
 
-- __`recording_saving.true_dir`__ and __`recording_saving.false_dir`__ specify the folders where recordings are saved. These paramenters are complementary to the __`paths.recordings`__ parameter. Recording with "true" detections (i.e., where the detection confidence score is greater or equal to the __`model.detection_threshold`__ parameter) are saved in the `true_dir` folder, while those with "false" detections (i.e., where the confidence score is lower than the __`model.detection_threshold`__ but higher than the __`recording_saving.saving_threshold`__) are saved in the `false_dir` folder. This aims at helping capturing possible __false negatives__. 
+- __`recording_saving.true_dir`__ and __`recording_saving.false_dir`__ specify the folders where recordings are saved. These paramenters are complementary to the __`paths.recordings`__ parameter. Recordings with "true" detections (i.e., where the detection confidence score is greater or equal to the __`model.detection_threshold`__ parameter) are saved in the `true_dir` folder, while those with "false" detections (i.e., where the confidence score is lower than the __`model.detection_threshold`__ but higher than the __`recording_saving.saving_threshold`__) are saved in the `false_dir` folder. This aims at helping capturing possible __false negatives__.
 - __`recording_saving.timeformat`__ determines the naming format for saved recordings. The timestamp in the filename reflects the starting time of a recording (i.e., the exact time the recording started).
 
 
-Detections made by the BatDetect2 model are transmitted to a remote server using the MQTT communication protocol. The following aprameters manage how and where this information is sent. 
+Detections made by the BatDetect2 model are transmitted to a remote server using the MQTT communication protocol. The following parameters manage how and where this information is sent. 
 
 - __`mqtt.host`__ and __`mqtt.topic`__ specify the destination (i.e., the server address and the topic) to which messages are sent. Messages contain information about the recording file, and the detection and classification found in the file. 
 - __`messaging.messages_db`__ sets the location of the local database on the device. This database stores outgoing messages and tracks their status - whether they are waiting to be sent, have been sent successfully or failed. 
@@ -89,9 +89,9 @@ Detections made by the BatDetect2 model are transmitted to a remote server using
 
 !!! Tip "How to define the `detection_threhold` value?"
 
-    The `detection_threshold` filters detections based on their confidence scores. Detections below this value will be disregarded, while those above or equal to this threshold will be saved. 
+    The `detection_threshold` selects detections based on their confidence scores. Detections below this value will be disregarded, while those above or equal to this threshold will be saved. 
 
-    The confidence score obtain from running the BatDetect2 model on your audio recordings depends on the modelps prediction accuracy and recall, as 
+    The confidence score obtained from running the BatDetect2 model on your audio recordings depends on the model's prediction accuracy and recall, as 
     well as factors like your audio recording device, 
     recorder location, and environmenal conditions. 
 
@@ -122,28 +122,28 @@ The table below provides detailed information about the parameters available whe
 | Parameter | Type | Default Value | Definition | Comment |
 |---|---|---|---|---|
 | __Microphone__| | | Microphone configuration.| |
-| `microphone.device_name`| str | - | Will show the name of the connected usb microphone.| Ensure it matches the device in use.|
-| `microphone.samplerate`| int (Hz) | - | Sampling rate of the microphone in Hz. | Set the sampling rate according to the microphone's specifications.|
-|`microphone.audio_channels`| int | - | Number of audio channels (i.e., 1 for mono).| Configure according to the microphone's capabilities.|
-| __Recording__| | | Microphone configuration.| |
-| `recording.duration`| int (sec.) | 3 | Duration in seconds for each audio recording. | The BatDetect2 model takes 3 seconds files as input.|
-| `recording.interval`| int (sec.) | 12 | Interval in seconds between recordings. | The BatDetect2 model requires some processing time. This interval helps maintain good performance. |
+| `microphone.device_name`| str | - | The name of the microphone to use for recording.| Ensure it matches the device in use.|
+| `microphone.samplerate`| int (Hz) | - | Sampling rate of the microphone in Hz. | Set the sampling rate according to the microphone's specifications, however keep in mind that `batdetect2` natively processes recordings at 256 kHz and resamples all non-matching recordings. |
+|`microphone.audio_channels`| int | - | Number of audio channels (i.e., 1 for mono).| Configure according to the microphone's capabilities, however keep in mind that `batdetect2` only uses the first audio channel.|
+| __Recording__| | | Configuration regarding the recording process.| |
+| `recording.duration`| int (sec.) | 3 | Duration in seconds for each audio recording. | The `batdetect2` model is able to process recordings of variable duration, however processing long recordings might lead to failure due to increased memory usage. Keep the duration between 1 and 3 seconds for optimal performance.|
+| `recording.interval`| int (sec.) | 12 | Interval in seconds between recordings. | The `batdetect2` model requires some processing time. This interval helps maintain good performance. |
 | `recording.chunksize`| int | 8192 | Chunksize of the audio recording.| An error will occur if the chunksize is too small for the audio device. |
 | `schedule_start`| time (HH:MM:SS)| 19:00:00 | Time of day when recordings will start (24-hour format).| Adjust according to specific monitoring needs (e.g., nightime hours). |
 | `schedule_end`| time (HH:MM:SS)| 07:00:00 | Time of day when recordings will end (24-hour format). | Adjust according to specific monitoring needs (e.g., nightime hours). |
 | `timezone`| string | "Europe/London" | Timezone of the sensor location. | Configure this according to your deployment region.|
 | __Paths__| | | Configuration for file paths.| |
 | `paths.tmp_audio`| string | "/run/shm" | Temporary storage path for audio recordings. | Temporary in-memory path. Do not modify. |
-| `paths.recordings`| string | "recordings" | Path to directory in "/home/pi/storages/" for storing recorded audio files. | Modify accordingly. With default paths, recordings are stored on the SDCard, modify if using external usb hardrive. |
-| `paths.db_metadata`| string | "metadata.db" | Path to the database file in "/home/pi/storages/" for storing the metadata. | This .db keeps track of recorded files, ML detection results, and system information. |
+| `paths.recordings`| string | "/home/pi/storages/recordings" | Path to directory for permanent storing of recorded audio files. | Modify accordingly. With default paths, recordings are stored on the SDCard, modify if using external usb hardrive. |
+| `paths.db_metadata`| string | "/home/pi/storages/metadata.db" | Path to the database file for storing the metadata. | This database keeps track of recorded files, ML detection results, and system information. |
 | __Messaging (Optional)__| | | Configuration for sending messages to remote server.| Will require access to network connectivity at the location of your device deployment. |
-| `messaging.messages_db`| str | "messages.db" | Path to the database file in /home/pi/storages/ for storing messages. | This .db keeps track of the messages to be sent to a remote server and their sending/receiving status. |
-| `messaging.message_send_interval`| int (sec.) | 120 | Interval in seconds for sending messages to a remote server. | Adjust for network performance and data bandwidth. |
+| `messaging.messages_db`| str | "/home/pi/storages/messages.db" | Path to the database file for storing messages. | This database keeps track of the messages to be sent to a remote server and their sent/received status. |
+| `messaging.message_send_interval`| int (sec.) | 120 | Interval in seconds between attempts to send messages to a remote server. | Adjust for network performance and data bandwidth. |
 | `messaging.heartbeat_interval` | int (sec.) | 3600 | Interval in seconds for sending heartbeat messages to the server. | Heartbeat message provides information about the device status (i.e., the correct functioning of the device). |
 | __Messaging HTTP (Optional)__| | | Configuration for sending messages via HTTP.| |
 | `messaging.http.base_url` | str | - | URL of the HTTP server to which messages are sent. | Configure according to your server setup. |
 | `messaging.http.content_type` | str | application/json | Content type of the HTTP messages. | Messages to be sent are formated into a `json` object. |
-| `messaging.http.timeout` | int (sec) | - | Timeout for HTTP requres in seconds.. | |
+| `messaging.http.timeout` | int (sec) | - | Timeout for HTTP requests in seconds. | |
 | __Messaging MQTT (Optional)__| | | Configuration for sending messages via MQTT.| |
 | `messaging.mqtt.host` | string | - | MQTT server hostname for message transmission. | Configure according to your server setup. |
 | `messaging.mqtt.username` | str | - | Username for authentication with the MQTT broker. | Replace with your server username. |
@@ -152,13 +152,13 @@ The table below provides detailed information about the parameters available whe
 | `messaging.mqtt.port`| int | 1884 |  Port number of the MQTT broker. | Default port is usually fine unless other setup on your server. |
 | `messaging.mqtt.timeout` | int (sec) | 5 | Timeout for connecting to the MQTT broker in seconds. | |
 | __Model__| | | Configuration related to running the BatDetect2 model. | |
-| `model.detection_threshold` | float | 0.4 | Defines the threshold for filtering the detections obtain by the model. | A float value between 0.01 and 0.99. |
+| `model.detection_threshold` | float | 0.4 | Defines the threshold for filtering the detections obtained by the model. | A float value between 0.01 and 0.99. |
 | __Recording Saving (Optional)__| | | Configuration for storing recordings processed by the model. | |
 | `recording_saving.true_dir` | str | "bats" | Path to the directory storing audio files with _confident_ detections (i.e., recordings with detection score greater or equal than the `detection_treshold`). | Folder located in the folder defined by the `path.recordings` parameter. |
 | `recording_saving.fasle_dir` | str | "no_bats" | Path to the directory storing audio files with _non-confident_ detections (i.e., recordings with detection score smaller than the `detection_treshold`). | Folder located in the folder defined by the `path.recordings` parameter. |
-| `recording_saving.timeformat` | str | "%Y%m%d_%H%M%S" | Defines how to name recording files. The default value capture the date and time when the recording stated. | A recording with name 20241004_183040.wav indicates that the recording  started on October 4, 2024 at 18:30:40. |
+| `recording_saving.timeformat` | str | "%Y%m%d_%H%M%S" | Defines how to name recording files. The default value capture the date and time when the recording stated. | A recording with name 20241004_183040.wav indicates that the recording started on October 4, 2024 at 18:30:40. |
 | `recording_saving.saving_threshold` | float | 0.2 | Defines the threshold for saving files containing non-confident detections. | A float value between 0.01 and 0.99. |
-| __Recording Saving Filters(Optional)__ | N/A | - | Additional configuration for storing recording. | |
+| __Recording Saving Filters(Optional)__ | N/A | - | Additional configurations for selecting which recordings to save. | |
 | `recording_saving.filters.starttime`| time (HH:MM:SS)| "21:00:00"| Start time for saving recorded audio files (24-hour format).| Insert 00:00:00 to not use this parameter to save audio recordings.|
 | `recording_saving.endtime`| time (HH:MM:SS)| "23:00:00"| End time for saving recorded audio files (24-hour format)| Insert 00:00:00 to not use this parameter to save audio recordings. |
 | `recording_saving.before_dawndusk_duration` | int (min.) | 0 | Additional duration (in minutes) to save recordings __before__ the dawn/dusk time.| Ensure recording interval covers the dawn and dusk time if using this parameter. |

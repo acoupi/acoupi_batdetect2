@@ -1,7 +1,12 @@
 """Acoupi detection and classification Models."""
 
+import logging
+
 from acoupi import data
 from acoupi.components import types
+
+# Set the logging level of the numba library to WARNING for easier debugging
+logging.getLogger("numba").setLevel(logging.WARNING)
 
 
 class BatDetect2(types.Model):
