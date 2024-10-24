@@ -2,7 +2,7 @@
 
 ## What is acoupi_batdetect2?
 
-*acoupi_batdetect2* is an open-source Python package that implement the [BatDetect2](https://github.com/macaodha/batdetect2) bioacoustics deep-learning model on edge devices like the [Raspberry Pi](https://www.raspberrypi.org/), using the [_acoupi_](https://acoupi.github.io/acoupi) framework. The BatDetect2 DL model has been developed by [Mac Aodha O., et al.](https://doi.org/10.1101/2022.12.14.520490) to detect and classify UK bats species. 
+*acoupi_batdetect2* is an open-source Python package that implement the [BatDetect2](https://github.com/macaodha/batdetect2) bioacoustic deep-learning model on edge devices like the RaspberryPi using the [_acoupi_](https://github.com/acoupi) framework. The BatDetect2 DL model has been developed by [Oisin M.A., et al.](https://doi.org/10.1101/2022.12.14.520490) to detect and classify UK bats species. 
 
 !!! Warning "What is the difference between _acoupi_ and _acoupi_batdetect2_?"
 

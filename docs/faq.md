@@ -1,7 +1,7 @@
 # FAQ
 
-## What is *acoupi-batdetect2*? 
-**acoupi-batdetect2** is the implementation of the AI Bioacoustics Classifier [BatDetect2](https://github.com/macaodha/batdetect2/tree/main) using acoupi Python toolkit. 
+#### What is acoupi-batdetect2? 
+**acoupi-batdetect2** is the implementation of the AI Bioacoustic Classifier [BatDetect2](https://github.com/macaodha/batdetect2/tree/main) using acoupi Python toolkit. 
 
 ## What is BatDetect2? 
 **BatDetect2** is a deep-learning model to detect and classify bat echolocation calls in high frequency audio recordings. 
