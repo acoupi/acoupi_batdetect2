@@ -16,8 +16,9 @@ from celery import Celery
 from celery.worker import WorkController
 
 from acoupi_batdetect2.configuration import (
+    BatDetect2_AudioConfig,
     BatDetect2_ConfigSchema,
-    SavingConfig,
+    SaveRecordingFilter,
 )
 from acoupi_batdetect2.program import BatDetect2_Program
 
@@ -75,12 +76,12 @@ def paths_config(tmp_path: Path) -> PathsConfiguration:
 
 
 @pytest.fixture
-def audio_config() -> AudioConfiguration:
-    return AudioConfiguration(duration=1, interval=2)
+def audio_config() -> BatDetect2_AudioConfig:
+    return BatDetect2_AudioConfig(duration=1, interval=2)
 
 
 @pytest.fixture
-def microphone_config():
+def microphone_config() -> MicrophoneConfig:
     return MicrophoneConfig(
         samplerate=44100,
         audio_channels=1,
@@ -102,7 +103,7 @@ def messaging_config(tmp_path: Path) -> MessagingConfig:
 def program_config(
     messaging_config: MessagingConfig,
     paths_config: PathsConfiguration,
-    audio_config: AudioConfiguration,
+    audio_config: BatDetect2_AudioConfig,
     microphone_config: MicrophoneConfig,
 ) -> BatDetect2_ConfigSchema:
     return BatDetect2_ConfigSchema(
@@ -110,9 +111,7 @@ def program_config(
         messaging=messaging_config,
         recording=audio_config,
         microphone=microphone_config,
-        recording_saving=SavingConfig(
-            filters=None,
-        ),
+        saving_filters=SaveRecordingFilter(),
     )
 
 

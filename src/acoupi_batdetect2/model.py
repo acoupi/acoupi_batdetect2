@@ -25,9 +25,20 @@ class BatDetect2(types.Model):
 
     def __init__(self):
         """Initialise the BatDetect2 model."""
+        self._api = None
+
+    @property
+    def api(self):
+        self.load_api()
+        return self._api
+
+    def load_api(self):
+        if self._api is not None:
+            return
+
         from batdetect2 import api
 
-        self.api = api
+        self._api = api
 
     def run(self, recording: data.Recording) -> data.ModelOutput:
         """Run the model on the recording.
@@ -52,11 +63,11 @@ class BatDetect2(types.Model):
             )
 
         # Load the audio file and compute spectrograms
-        audio = self.api.load_audio(str(audio_file_path))
-        spec = self.api.generate_spectrogram(audio)
+        audio = self.api.load_audio(str(audio_file_path))  # type: ignore
+        spec = self.api.generate_spectrogram(audio)  # type: ignore
 
         # Process the audio or the spectrogram with the model
-        raw_detections, _ = self.api.process_spectrogram(spec)
+        raw_detections, _ = self.api.process_spectrogram(spec)  # type: ignore
 
         # Convert the raw detections to a list of detections
         detections = [

@@ -96,7 +96,7 @@ class BatDetect2_ConfigSchema(DetectionProgramConfiguration):
     model setup, file management, messaging, and summarisation.
     """
 
-    recording: BatDetect2_AudioConfig = Field(
+    recording: BatDetect2_AudioConfig = Field(  # type: ignore
         default_factory=BatDetect2_AudioConfig,
     )
     """Audio recording configuration."""

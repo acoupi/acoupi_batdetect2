@@ -134,11 +134,11 @@ def test_management_tempfile_positive_detection(
     temp_recording: data.Recording,
 ):
     audio_dir = program_config.paths.recordings
-    true_dir = audio_dir / program_config.saving.true_dir
+    true_dir = audio_dir / program_config.saving_managers.true_dir
 
     assert len(get_temp_files(path=program_config.paths.tmp_audio)) != 0
     assert audio_dir.exists()
-    assert (audio_dir / program_config.saving.true_dir).exists()
+    assert (audio_dir / program_config.saving_managers.true_dir).exists()
     assert len(list(audio_dir.glob("*.wav"))) == 0
     assert len(list(true_dir.glob("*.wav"))) == 0
 
@@ -152,6 +152,11 @@ def test_management_tempfile_positive_detection(
     # Run the detection task on the test recording.
     model_output = program.tasks["detection_task"].delay(temp_recording)
     model_output.get()
+
+    assert temp_recording.path is not None
+    _, outputs = program.store.get_recordings_by_path(
+        [temp_recording.path]
+    )[0]
 
     # Run the file_management task on the test detection.
     output_file_task = program.tasks["file_management_task"].delay()
@@ -172,8 +177,8 @@ def test_management_tempfile_negative_detection(
     # Make sure there is a single file in the temporary audio folder but
     # the audio directories are empty.
     audio_dir = program_config.paths.recordings
-    true_dir = audio_dir / program_config.saving.true_dir
-    false_dir = audio_dir / program_config.saving.false_dir
+    true_dir = audio_dir / program_config.saving_managers.true_dir
+    false_dir = audio_dir / program_config.saving_managers.false_dir
     assert len(get_temp_files(path=program_config.paths.tmp_audio)) != 0
     assert audio_dir.exists()
     assert true_dir.exists()
