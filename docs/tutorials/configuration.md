@@ -37,7 +37,7 @@ Detections made by the BatDetect2 model are transmitted to a remote server using
         },
         "recording": {
             "duration": 3,
-            "interval": 12,
+            "interval": 10,
             "chunksize": 8192,
             "schedule_start": "19:00:00",
             "schedule_end": "07:00:00"
@@ -127,7 +127,7 @@ The table below provides detailed information about the parameters available whe
 |`microphone.audio_channels`| int | - | Number of audio channels (i.e., 1 for mono).| Configure according to the microphone's capabilities, however keep in mind that `batdetect2` only uses the first audio channel.|
 | __Recording__| | | Configuration regarding the recording process.| |
 | `recording.duration`| int (sec.) | 3 | Duration in seconds for each audio recording. | The `batdetect2` model is able to process recordings of variable duration, however processing long recordings might lead to failure due to increased memory usage. Keep the duration between 1 and 3 seconds for optimal performance.|
-| `recording.interval`| int (sec.) | 12 | Interval in seconds between recordings. | The `batdetect2` model requires some processing time. This interval helps maintain good performance. |
+| `recording.interval`| int (sec.) | 10 | Interval in seconds between recordings. | The `batdetect2` model requires some processing time. This interval helps maintain good performance. |
 | `recording.chunksize`| int | 8192 | Chunksize of the audio recording.| An error will occur if the chunksize is too small for the audio device. |
 | `schedule_start`| time (HH:MM:SS)| 19:00:00 | Time of day when recordings will start (24-hour format).| Adjust according to specific monitoring needs (e.g., nightime hours). |
 | `schedule_end`| time (HH:MM:SS)| 07:00:00 | Time of day when recordings will end (24-hour format). | Adjust according to specific monitoring needs (e.g., nightime hours). |
