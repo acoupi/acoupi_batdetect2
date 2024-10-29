@@ -7,7 +7,7 @@ To **reject and modify** a setting, press the keyboard letter __`n`__ and input 
 
 The video shows the configuration process for the _acoupi_batdetect2_ program via the CLI.
 
-![type:video](../img/acoupi_configuration.mp4){: style='width: 100%'}
+![type:video](../img/acoupi_batdetect2_configuration.mp4){: style='width: 100%'}
 
 ### Configuration Parameters
 
