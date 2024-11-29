@@ -52,6 +52,9 @@ class SaveRecordingFilter(BaseModel):
     frequency_interval: int = 0
     """Optional periodic interval in minutes to save recordings."""
 
+    saving_threshold: float = 0.3
+    """Minimum threshold of detections from a recording to save it."""
+
 
 class SaveRecordingManager(BaseModel):
     """Saving configuration for audio recordings.
@@ -68,7 +71,7 @@ class SaveRecordingManager(BaseModel):
     timeformat: str = "%Y%m%d_%H%M%S"
     """Time format for naming the audio recording files."""
 
-    saving_threshold: float = 0.2
+    bat_threshold: float = 0.5
     """Minimum threshold of detections from a recording to save it."""
 
 
@@ -106,7 +109,7 @@ class BatDetect2_ConfigSchema(DetectionProgramConfiguration):
     )
     """Model output configuration."""
 
-    saving_filters: SaveRecordingFilter = Field(
+    saving_filters: Optional[SaveRecordingFilter] = Field(
         default_factory=SaveRecordingFilter,
     )
     """Recording Saving Filters configuration for audio recordings."""
