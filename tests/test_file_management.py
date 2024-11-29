@@ -145,18 +145,15 @@ def test_management_tempfile_positive_detection(
     # Store test recording in the database to test the test.
     program.store.store_recording(temp_recording)
 
-    # Check that the program has a detection and file_management task.
-    assert "detection_task" in program.tasks
-    assert "file_management_task" in program.tasks
-
     # Run the detection task on the test recording.
     model_output = program.tasks["detection_task"].delay(temp_recording)
     model_output.get()
 
-    assert temp_recording.path is not None
-    _, outputs = program.store.get_recordings_by_path(
-        [temp_recording.path]
-    )[0]
+    print(model_output)
+
+    # Check the recording is in the temporary folder before running the
+    # file management task
+    assert len(get_temp_files(path=program_config.paths.tmp_audio)) == 1
 
     # Run the file_management task on the test detection.
     output_file_task = program.tasks["file_management_task"].delay()

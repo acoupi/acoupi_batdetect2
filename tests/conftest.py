@@ -7,7 +7,6 @@ import pytest
 from acoupi import data
 from acoupi.components import HTTPConfig, MicrophoneConfig
 from acoupi.programs.templates import (
-    AudioConfiguration,
     MessagingConfig,
     PathsConfiguration,
 )
@@ -18,7 +17,6 @@ from celery.worker import WorkController
 from acoupi_batdetect2.configuration import (
     BatDetect2_AudioConfig,
     BatDetect2_ConfigSchema,
-    SaveRecordingFilter,
 )
 from acoupi_batdetect2.program import BatDetect2_Program
 
@@ -111,7 +109,7 @@ def program_config(
         messaging=messaging_config,
         recording=audio_config,
         microphone=microphone_config,
-        saving_filters=SaveRecordingFilter(),
+        saving_filters=None,
     )
 
 
