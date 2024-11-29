@@ -4,7 +4,7 @@ requires-python = ">=3.9, <3.11"
 [[package]]
 name = "acoupi"
 version = "0.1.0"
-source = { directory = "../acoupi" }
+source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "astral" },
     { name = "celery" },
@@ -22,49 +22,9 @@ dependencies = [
     { name = "pyyaml" },
     { name = "requests" },
 ]
-
-[package.metadata]
-requires-dist = [
-    { name = "astral", specifier = ">=3.2" },
-    { name = "celery", specifier = ">=5.4.0" },
-    { name = "click", specifier = ">=8.1.3" },
-    { name = "eventlet", specifier = ">=0.36.1" },
-    { name = "jinja2", specifier = ">=3.1.2" },
-    { name = "paho-mqtt", specifier = ">=1.6.1" },
-    { name = "pony", specifier = ">=0.7.16" },
-    { name = "pyaudio", specifier = ">=0.2.13" },
-    { name = "pydantic", specifier = ">=1.10.8" },
-    { name = "pydantic-extra-types", specifier = ">=2.9.0" },
-    { name = "pydantic-settings", specifier = ">=2.0.3" },
-    { name = "pygments", specifier = ">=2.18.0" },
-    { name = "pytz", specifier = ">=2023.3.post1" },
-    { name = "pyyaml", specifier = ">=6.0" },
-    { name = "requests", specifier = ">=2.31.0" },
-]
-
-[package.metadata.requires-dev]
-dev = [
-    { name = "black", specifier = ">=23.3.0" },
-    { name = "coverage", extras = ["toml"], specifier = ">=7.2.2" },
-    { name = "flower", specifier = ">=2.0.1" },
-    { name = "furo", specifier = ">=2023.3.27" },
-    { name = "isort", specifier = ">=5.11.5" },
-    { name = "mkdocs", specifier = ">=1.5.3" },
-    { name = "mkdocs-click", specifier = ">=0.8.1" },
-    { name = "mkdocs-gitbook", specifier = ">=0.0.1" },
-    { name = "mkdocs-material", specifier = ">=9.2.7" },
-    { name = "mkdocs-video", specifier = ">=1.5.0" },
-    { name = "mkdocstrings", extras = ["python"], specifier = ">=0.22.0" },
-    { name = "pony-stubs", specifier = ">=0.5.2" },
-    { name = "pyright", specifier = ">=1.1.375" },
-    { name = "pytest", specifier = ">=7.4.4" },
-    { name = "pytest-celery", specifier = ">=1.0.1" },
-    { name = "pytest-httpserver", specifier = ">=1.0.6" },
-    { name = "pytest-mock", specifier = ">=3.14.0" },
-    { name = "ruff", specifier = ">=0.1.6" },
-    { name = "sphinx", specifier = ">=5.3.0" },
-    { name = "sphinx-autobuild", specifier = ">=2021.3.14" },
-    { name = "sphinx-copybutton", specifier = ">=0.5.1" },
+sdist = { url = "https://files.pythonhosted.org/packages/da/86/40a371fe20780f1c5240f173e4557ca6d421b82bd1082b24193886a962cb/acoupi-0.1.0.tar.gz", hash = "sha256:ee6e5524201e83d7ae5af0377d9f2831a111ac53d1f0995be1aa0b0209fc98d4", size = 50356283 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/00/cc/3984d7786753454503b021f1c6028808d8beff3270d00df0470706c760be/acoupi-0.1.0-py3-none-any.whl", hash = "sha256:3471266894fd420d62e6d55d38459c19f253eaba3e57487c5c1a90c6d269fdd6", size = 112081 },
 ]
 
 [[package]]
@@ -93,8 +53,8 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "acoupi", directory = "../acoupi" },
-    { name = "batdetect2", specifier = ">=1.0.7" },
+    { name = "acoupi", specifier = ">=0.1.0" },
+    { name = "batdetect2", specifier = ">=1.1.0" },
     { name = "pydantic-settings", specifier = ">=2.1.0" },
     { name = "pygments", specifier = ">=2.18.0" },
 ]

@@ -8,8 +8,8 @@ authors = [
 ]
 
 dependencies = [
-  "acoupi",
-  "batdetect2>=1.0.7",
+  "acoupi>=0.1.0",
+  "batdetect2>=1.1.0",
   "pydantic-settings>=2.1.0",
   "pygments>=2.18.0",
 ]
@@ -60,6 +60,3 @@ source = ["src/acoupi_batdetect2"]
 venvPath = "."
 venv = ".venv"
 pythonVersion = "3.9"
-
-[tool.uv.sources]
-acoupi = { path = "../acoupi" }
