@@ -16,10 +16,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Apt dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y portaudio19-dev rabbitmq-server
+      - name: Install Acoupi Dependencies
+        run: curl -sSL https://github.com/acoupi/acoupi/raw/main/scripts/setup.sh | bash
 
       - name: Install uv
         uses: astral-sh/setup-uv@v4
@@ -40,4 +38,4 @@ jobs:
         run: uv run pyright src
 
       - name: Run tests
-        run: uv run pytest tests -n auto
+        run: uv run pytest -xsv tests
