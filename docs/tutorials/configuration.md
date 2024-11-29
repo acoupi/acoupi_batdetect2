@@ -15,7 +15,7 @@ The following is an example of how an _acoupi_batdetect2_ program can be configu
 
 In this setup, the device records audio in 3 second clips every 12 seconds, from 7pm to 7am. However, the device only saves recordings between 9pm (__`saving_filters.starttime`__) and 11pm  (__`saving_filters.endttime`__). Several parameters control how and when recordings are saved. 
 
-- __`saving_managers.true_dir`__ and __`saving_managers.false_dir`__ specify the folders where recordings are saved. These paramenters are complementary to the __`paths.recordings`__ parameter. Recordings with "true" detections (i.e., where the detection confidence score is greater or equal to the __`model.detection_threshold`__ parameter) are saved in the `true_dir` folder, while those with "false" detections (i.e., where the confidence score is lower than the __`model.detection_threshold`__ but higher than the __`saving_managers.saving_threshold`__) are saved in the `false_dir` folder. This aims at helping capturing possible false negatives.
+- __`saving_managers.true_dir`__ and __`saving_managers.false_dir`__ specify the folders where recordings are saved. These paramenters are complementary to the __`paths.recordings`__ parameter. Recordings with "true" detections (i.e., where the detection confidence score is greater or equal to the __`model.detection_threshold`__ parameter) are saved in the `true_dir` folder, while those with "false" detections (i.e., where the confidence score is lower than the __`model.detection_threshold`__ but higher than the __`saving_managers.bat_threshold`__) are saved in the `false_dir` folder. This aims at helping capturing possible false negatives.
 - __`saving_managers.timeformat`__ determines the naming format for saved recordings. The timestamp in the filename reflects the starting time of a recording (i.e., the exact time the recording started).
 
 
@@ -71,12 +71,13 @@ Detections made by the BatDetect2 model are transmitted to a remote server using
           "after_dawndusk_duration": 0,
           "frequency_duration": 0,
           "frequency_interval": 0
+          "saving_threshold": '0.3,
         },
         "saving_managers": {
           "true_dir": "bats",
           "false_dir": "no_bats",
           "timeformat": "%Y%m%d_%H%M%S",
-          "saving_threshold": 0.2
+          "bat_threshold": 0.5,
         },
         "summariser_config": {
           "interval": 3600.0,
@@ -160,11 +161,12 @@ The table below provides detailed information about the parameters available whe
 | `saving_filters.after_dawndusk_duration`  | int (min.) | 0 |  Additional duration (in minutes) to save recordings __after__ the dawn/dusk time.| Ensure recording interval covers the dawn and dusk time if using this parameter. |
 | `saving_filters.frequency_duration` | int (min.) | 0 | Duration in minutes for storing recordings when using the frequency filter. | Set to zero if not using this parameter.|
 | `saving_filters.frequency_interval` | int (min.) | 0 | Periodic interval in minutes between two periods of storing recordings. | Set to zero if not using this parameter. |
+| `saving_filters.saving_threshold` | float | 0.2 | Defines the threshold for saving files containing detections. | A float value between 0.01 and 0.99. |
 | __Recording Saving Managers (Optional)__| | | Additional configurations for managing recordings processed by the model. | |
 | `saving_managers.true_dir` | str | "bats" | Path to the directory storing audio files with _confident_ detections (i.e., recordings with detection score greater or equal than the `detection_threshold`). | Folder located in the folder defined by the `path.recordings` parameter. |
 | `saving_managers.false_dir` | str | "no_bats" | Path to the directory storing audio files with _non-confident_ detections (i.e., recordings with detection score smaller than the `detection_threshold`). | Folder located in the folder defined by the `path.recordings` parameter. |
 | `saving_managers.timeformat` | str | "%Y%m%d_%H%M%S" | Defines how to name recording files. The default value capture the date and time when the recording stated. | A recording with name 20241004_183040.wav indicates that the recording started on October 4, 2024 at 18:30:40. |
-| `saving_managers.saving_threshold` | float | 0.2 | Defines the threshold for saving files containing non-confident detections. | A float value between 0.01 and 0.99. |
+| `saving_managers.bat_threshold` | float | 0.5 | Defines the threshold for saving files in folders based on confident and non-confident detections. | A float value between 0.01 and 0.99. |
 | __Summariser (Optional)__| | | Configuration for creating summary messages of the detections. | |
 | `summariser.interval` | float | 3600 | Interval for which detections will be summarised. | In minutes. |
 | `summariser.low_band_threshold` | float | 0.0 | Count the number of bat calls for each species that have a classification score lower or equal to the threshold. | A float value between 0.01 and 0.99 |
