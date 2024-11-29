@@ -52,6 +52,8 @@ the `false_dir` directory.
      (in minutes) before dawn and dusk, set by the `before_dawndusk_duration`.
     4. An after dawn/dusk filter to save recording for a defined duration
      (in minutes) after dawn and dusk, set by the `after_dawndusk_duration`.
+    5. A saving threshold filter to save recording with detection above a specific 
+    treshold, set by the `saving_filter` parameter. 
 
 - __SummariserConfig__: Define the interval for summarising detections.
 By default, the summariser calculates the minimum, maximum, and average
