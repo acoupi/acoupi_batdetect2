@@ -18,7 +18,7 @@ jobs:
 
       - name: Install Apt dependencies
         run: |
-          sud apt-get update
+          sudo apt-get update
           sudo apt-get install -y portaudio19-dev rabbitmq-server
 
       - name: Install uv
