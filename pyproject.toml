@@ -14,7 +14,7 @@ dependencies = [
   "pygments>=2.18.0",
 ]
 
-requires-python = ">=3.9,<3.11"
+requires-python = ">=3.9,<3.13"
 readme = "README.md"
 license = { text = "Creative Commons Attribution-NonCommercial 4.0 International" }
 
