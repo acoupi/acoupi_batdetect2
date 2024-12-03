@@ -8,7 +8,7 @@ resolution-markers = [
 
 [[package]]
 name = "acoupi"
-version = "0.2.0"
+version = "0.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "astral" },
@@ -27,14 +27,14 @@ dependencies = [
     { name = "pyyaml" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/65/5d/f00e1d93e7434c82616a588104713f6f74b58547b341bbe26f964c391fa8/acoupi-0.2.0.tar.gz", hash = "sha256:71f1e9c0bad05001918b27b6e9cfdea9fa48aed6efd7a9fbb5237a65e828e332", size = 50058648 }
+sdist = { url = "https://files.pythonhosted.org/packages/bd/9b/3587b53af42b35ac831df07cb9848b70fcedc7c29a080027947d3d142fa2/acoupi-0.3.0.tar.gz", hash = "sha256:fc1f569080a8ec14438a700b87e38bbdcf693c5edf92648e69f39bf25117890e", size = 50059585 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/88/1d/be3497e4415e0f53c0e9b2e25f9dddc6c8a3b8d5e5ebcbe73cc07c0d0939/acoupi-0.2.0-py3-none-any.whl", hash = "sha256:b99c048bea343bc342a240874c2026d8bc1b8cc8fc368e498a7957b9fb025156", size = 118079 },
+    { url = "https://files.pythonhosted.org/packages/6d/d1/668360660540e6a2512654c80046c526f7e879e78bb2b24b8115285db9f1/acoupi-0.3.0-py3-none-any.whl", hash = "sha256:1fadcce6c53e32252328d68282aec2b2838790541194f69a9e4309962666319d", size = 118384 },
 ]
 
 [[package]]
 name = "acoupi-batdetect2"
-version = "0.1.0"
+version = "0.2.0"
 source = { editable = "." }
 dependencies = [
     { name = "acoupi" },

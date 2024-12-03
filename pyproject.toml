@@ -8,7 +8,7 @@ authors = [
 ]
 
 dependencies = [
-  "acoupi>=0.2.0",
+  "acoupi>=0.3.0",
   "batdetect2>=1.1.0",
   "pydantic-settings>=2.1.0",
   "pygments>=2.18.0",
